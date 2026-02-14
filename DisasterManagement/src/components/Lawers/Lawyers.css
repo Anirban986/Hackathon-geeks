@@ -1,0 +1,79 @@
+.lawyers-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap:20px;
+}
+
+.lawyer-card{
+  background:white;
+  border-radius:14px;
+  border: 1px solid blue;
+  padding:18px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+  transition:0.2s;
+}
+
+.lawyer-card:hover{
+  transform:translateY(-4px);
+}
+
+.lawyer-header{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.avatar{
+  width:50px;
+  height:50px;
+  background:#2c3e50;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  font-weight:bold;
+  font-size:18px;
+}
+
+.spec{
+  color:#0077ff;
+  font-weight:600;
+}
+
+.location{
+  font-size:13px;
+  color:#777;
+}
+
+.lawyer-stats{
+  display:flex;
+  justify-content:space-between;
+  margin:15px 0;
+  text-align:center;
+}
+
+.lawyer-stats span{
+  font-weight:bold;
+  display:block;
+}
+
+.lawyer-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.fee{
+  font-weight:bold;
+  color:#2c3e50;
+}
+
+.hire-btn{
+  background:#0077ff;
+  color:white;
+  border:none;
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}

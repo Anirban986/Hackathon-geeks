@@ -4,15 +4,17 @@
   box-sizing: border-box;
 }
 
-body {
+/*body {
   height: 100vh;
+  width: 100%;
   background:
      linear-gradient(rgba(0, 0, 80, 0.696), rgba(0, 0, 80, 0.696)),
     url("../../assets/Supreme-Court.jpg");
 
   background-size: cover;
   background-position: center;
-}
+  background-repeat: no-repeat;
+}*/
 
 .hero {
   display: flex;
@@ -42,7 +44,7 @@ body {
   width: 60%;
   line-height: 1.5;
   font-size: 20px;
-  color: rgb(203, 203, 203);
+  color: rgb(0, 0, 0);
 }
 
 .section1 {
@@ -56,10 +58,10 @@ body {
 .section-items {
   width: 200px;
   text-align: center;
-  border: 2px solid rgba(248, 248, 248, 0.252);
+  border: 2px solid rgba(0, 21, 255, 0.471);
   padding: 30px;
   border-radius: 20px;
-  background-color: rgba(111, 111, 111, 0.382);
+  background-color: rgb(255, 255, 255);
   box-shadow: 0px 7px 10px 0px rgba(0, 0, 0, 0.211);
   transition: transform 0.2s;
 }
@@ -72,12 +74,12 @@ body {
 .section-items h1 {
   font-size: 18px;
   margin-bottom: 5px;
-  color: #ffffff;
+  color: #000000;
 }
 
 .section-items p {
   font-size: 14px;
-  color: #c9c7c7;
+  color: #7b7b7b;
 }
 
 /* Section 2 (links or buttons) */

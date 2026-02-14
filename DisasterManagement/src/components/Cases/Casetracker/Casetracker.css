@@ -18,7 +18,7 @@
   -webkit-text-fill-color: transparent;
 }
 .dashboard-top-segment1 p{
-    color: rgba(255, 255, 255, 0.922);
+    color: rgba(0, 0, 0, 0.922);
 }
 .dashboard-top-segment2 {
   display: flex;
@@ -232,6 +232,65 @@
 .portal-buttons button:last-child:hover {
   background: #ddd;
 }
+
+/* Background blur */
+.modal-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+/* popup card */
+.modal-card{
+  background:white;
+  border-radius:12px;
+  padding:20px;
+  width:600px;
+  max-height:85vh;
+  overflow-y:auto;
+  animation:popup 0.25s ease;
+}
+
+/* bigger modal for case search */
+.modal-card.large{
+  width:900px;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.modal-header button{
+  background:#333;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+@keyframes popup{
+  from{
+    transform:scale(0.85);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
 
 /* Smooth fade-in animation */
 @keyframes fadeIn {

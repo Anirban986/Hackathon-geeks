@@ -21,7 +21,7 @@
 
 .emergency-top p {
   font-size: 18px;
-  color: rgb(203, 203, 203);
+  color: rgb(0, 0, 0);
 }
 
 .emergency-bottom {
@@ -115,7 +115,7 @@
 }
 
 .emergency-foot {
-  border: 1px solid rgba(255, 255, 255, 0.516);
+  border: 1px solid rgba(0, 106, 255, 0.874);
   max-width: 1000px;
   border-radius: 15px;
   margin: 0 auto 50px;
@@ -136,7 +136,7 @@
 .emergency-foot-1 h2 {
   font-size: 20px;
   font-weight: 300;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 .emergency-foot-block {
@@ -152,8 +152,8 @@
 .emergency-foot-blocks {
   width: 100%;
   max-width: 400px;
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  background-color: rgba(111, 111, 111, 0.382);
+  border: 1px solid rgba(0, 94, 255, 0.38);
+  background-color: rgba(255, 255, 255, 0.382);
   padding: 10px;
   border-radius: 10px;
 }
@@ -166,7 +166,7 @@
 .block1 h1 {
   font-size: 22px;
   font-weight: 400;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 .brand {
   font-size: 12px;
@@ -179,12 +179,12 @@
   margin-bottom: 10px;
 }
 .para p {
-  color: rgba(86, 86, 86, 0.922);
+  color: rgba(126, 126, 126, 0.922);
 }
 
 .download {
   display: flex;
-  color: aliceblue;
+  color: rgb(0, 0, 0);
   width: 150px;
   border: 1px solid rgb(255, 255, 255);
   padding: 5px 0;
@@ -198,7 +198,7 @@
 .download:hover {
   background-color: rgba(193, 250, 255, 0.653);
   border: none;
-  color: black;
+ 
 }
 .download img {
   width: 20px;

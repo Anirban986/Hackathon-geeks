@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import { Route,Routes } from 'react-router'
 import Navbar from './components/navbar/Navbar'
+import About from './components/AboutUs/AboutUs'
 import Home from './components/home/Home'
 import Learn from './components/Learn/Learn'
 import Vertual from './components/Vertual/Vertual'
@@ -33,8 +34,9 @@ function App() {
       <Route path='/Dashboard' element={<Dashboard/>}/>
       <Route path='/Community' element={<Community/>}/>
       <Route path='/loginstudent' element={<LoginStudent/>}/>
-       <Route path='/Loginparent' element={<LoginParent/>}/>
-        <Route path='/Loginteacher' element={<LoginTeacher/>}/>
+      <Route path='/Loginparent' element={<LoginParent/>}/>
+      <Route path='/Loginteacher' element={<LoginTeacher/>}/>
+      <Route path='/AboutUs' element={<About/>}/>
      </Routes>
        {/* Only show footer if modal is closed */}
       {!showSignup && <Footer />}

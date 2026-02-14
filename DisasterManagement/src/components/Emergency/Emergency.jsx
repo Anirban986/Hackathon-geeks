@@ -105,15 +105,15 @@ function Emergency() {
       <div className="emergency-foot">
         <div className="emergency-foot-1">
           <img src={learn} alt="" />
-          <h2>Educational Resources</h2>
+          <h2>Legal Resources</h2>
         </div>
         <div className="emergency-foot-block">
           <div className="emergency-foot-blocks">
             <div className="block1">
-              <h1>NDMA Guidelines for Schools</h1>
+              <h1>Court forms</h1>
               <div className='brand'>Official</div>
             </div>
-            <div className="para"><p>Official disaster management guidelines from National Disaster Management Authority.</p></div>
+            <div className="para"><p>The judiciary introduces an enhanced electronic filing system for improved accessibility and efficiency.</p></div>
             <div className="download">
               <img src={download} alt="" />
               <p>Download</p>
@@ -122,10 +122,10 @@ function Emergency() {
 
           <div className="emergency-foot-blocks">
             <div className="block1">
-              <h1>Earthquake Safety for Students</h1>
+              <h1>New Court Security Guidelines</h1>
               <div className='brand'>Safety</div>
             </div>
-            <div className="para"><p>Comprehensive guide for earthquake preparedness in Indian schools.</p></div>
+            <div className="para"><p>Enhanced security measures implemented across all courthouses to ensure public safety.</p></div>
             <div className="download">
               <img src={download} alt="" />
               <p>Download</p>
@@ -134,10 +134,10 @@ function Emergency() {
 
           <div className="emergency-foot-blocks">
             <div className="block1">
-              <h1>Monsoon Flood Response Plan</h1>
-              <div className='brand'>Emergenc</div>
+              <h1>Court Holiday Schedule Released</h1>
+              <div className='brand'>Emergency</div>
             </div>
-            <div className="para"><p>Emergency procedures during monsoon flooding and waterlogging.</p></div>
+            <div className="para"><p>View the updated court holiday schedule for the upcoming fiscal year.</p></div>
             <div className="download">
               <img src={download} alt="" />
               <p>Download</p>
@@ -146,10 +146,10 @@ function Emergency() {
 
           <div className="emergency-foot-blocks">
             <div className="block1">
-              <h1>Fire Safety Protocols</h1>
-              <div className='brand'>Fire Safety</div>
+              <h1>Judicial Training Program Success</h1>
+              <div className='brand'>News</div>
             </div>
-            <div className="para"><p>Fire prevention and evacuation procedures for educational institutions.</p></div>
+            <div className="para"><p>Over 200 legal professionals complete advanced training in alternative dispute resolution.</p></div>
             <div className="download">
               <img src={download} alt="" />
               <p>Download</p>

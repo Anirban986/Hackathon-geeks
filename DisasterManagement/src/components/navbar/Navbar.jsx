@@ -76,11 +76,11 @@ const handleLogout = () => {
           </li>
         </NavLink>
 
-      {/*  <NavLink to="/vertual" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+     {/*  <NavLink to="/AboutUs" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
               <img className="navmenu-img" src={vertual} alt="" />
-              <h1>Cases</h1>
+              <h1>About us</h1>
             </div>
           </li>
         </NavLink>
