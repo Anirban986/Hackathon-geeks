@@ -1,0 +1,135 @@
+import React, { useState, useEffect } from 'react';
+import './Home.css';
+import school from '../../assets/school.svg';
+import student from '../../assets/student.svg';
+import trophy from '../../assets/trophy.svg';
+import map from '../../assets/map.svg';
+import activity from '../../assets/activity.svg';
+import achievement from '../../assets/achievement.svg';
+import safty from '../../assets/safty.svg';
+import peaple from '../../assets/peaple.svg';
+import { Link } from 'react-router';
+import IndiaDisasterMap from '../intaractiveMap/IndiaDisasterMap';
+import Weather from '../weather/Weather';
+import { motion } from "framer-motion"
+
+function Home() {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const checkUser = () => {
+            const token = localStorage.getItem("token");
+            const userName = localStorage.getItem("userName");
+            const role = localStorage.getItem("role"); // get role
+            if (token && userName && role) {
+                setUser({ name: userName, role });
+            } else {
+                setUser(null);
+            }
+        };
+
+        checkUser();
+
+        window.addEventListener("login", checkUser);
+        window.addEventListener("logout", checkUser);
+
+        return () => {
+            window.removeEventListener("login", checkUser);
+            window.removeEventListener("logout", checkUser);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("role");
+        setUser(null);
+        window.dispatchEvent(new Event("logout"));
+        window.location.href = "/";
+    };
+
+    const isStudentParentTeacher = ["student", "parent", "teacher"].includes(user?.role);
+    const isStudentParentTeacheradmin = ["student", "parent", "teacher", "admin"].includes(user?.role);
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className='home'
+        >
+            <div className="hero">
+                <h1><span>Serving the Nation by Upholding Justice</span></h1>
+                <p>Access court services, check case status, and explore legal resources through our comprehensive judiciary portal.</p>
+            </div>
+
+            <div className="section1">
+                <div className="section-items">
+                    <img src={school} alt="" />
+                    <h1>1234+</h1>
+                    <p>Cases solved this year</p>
+                </div>
+                <div className="section-items">
+                    <img src={student} alt="" />
+                    <h1>1234+</h1>
+                    <p>Judges serving accross al courts</p>
+                </div>
+                <div className="section-items">
+                    <img src={trophy} alt="" />
+                    <h1>24/7</h1>
+                    <p>Online access</p>
+                </div>
+                <div className="section-items">
+                    <img src={achievement} alt="" />
+                    <h1>90%</h1>
+                    <p>Satisfaction rate</p>
+                </div>
+            </div>
+
+           { /*<div className="section3">
+                <Link className='sec-link' to='/learn'>
+                    <div className="section3-items">
+                        <img src={map} alt="" />
+                        <h1>Interactive Learning</h1>
+                        <p>Region-specific disaster education modules</p>
+                    </div>
+                </Link>
+
+                <Link className='sec-link' to='/vertual'>
+                    <div className="section3-items">
+                        <img src={activity} alt="" />
+                        <h1>Case Tracker</h1>
+                        <p>Practice emergency procedures safely</p>
+                    </div>
+                </Link>
+                {isStudentParentTeacheradmin && (
+                    <Link className='sec-link' to='/Community'>
+                        <div className="section3-items">
+                            <img src={peaple} alt="" />
+                            <h1>Community</h1>
+                            <p>Communicate with peers</p>
+                        </div>
+                    </Link>
+
+                )}
+
+                <Link className='sec-link' to='/safty'>
+                    <div className="section3-items">
+                        <img src={safty} alt="" />
+                        <h1>Safety Games</h1>
+                        <p>Learn through engaging gameplay</p>
+                    </div>
+                </Link>
+            </div>*/}
+
+            {/* Only show map and weather for student, parent, teacher */}
+           { /*{isStudentParentTeacher && (
+                <div className="map">
+                    <IndiaDisasterMap />
+                    <Weather />
+                </div>
+            )}*/}
+        </motion.div>
+    );
+}
+
+export default Home;
