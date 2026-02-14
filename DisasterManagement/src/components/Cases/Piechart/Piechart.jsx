@@ -7,25 +7,24 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import "./DrillPerformancePie.css";
+import "./Piechart.css";
 
-// Case status distribution
 const data = [
-  { name: "Disposed", value: 520 },
-  { name: "Under Trial", value: 410 },
-  { name: "Pending", value: 300 },
-  { name: "Stayed", value: 120 },
-  { name: "Appeals Filed", value: 90 },
+  { name: "Under Review", value: 2 },
+  { name: "Hearing Scheduled", value: 3 },
+  { name: "Evidence Stage", value: 1 },
+  { name: "Judgment Pending", value: 1 },
+  { name: "Disposed", value: 4 },
 ];
 
-const COLORS = ["#2ecc71", "#3498db", "#f1c40f", "#e67e22", "#e74c3c"];
+const COLORS = ["#3498db", "#f1c40f", "#9b59b6", "#e67e22", "#2ecc71"];
 
-function DrillPerformancePie() {
+function Piechart() {
   const total = data.reduce((sum, entry) => sum + entry.value, 0);
 
   return (
     <div className="pie-chart-container">
-      <h2 className="pie-chart-title">Case Status Distribution</h2>
+      <h2 className="pie-chart-title">Your Case Status Overview</h2>
 
       <ResponsiveContainer width="100%" height={400}>
         <PieChart>
@@ -35,19 +34,19 @@ function DrillPerformancePie() {
             cy="50%"
             outerRadius={140}
             dataKey="value"
-            label={({ value }) => `${((value / total) * 100).toFixed(1)}%`}
+            label={({ value }) => `${((value / total) * 100).toFixed(0)}%`}
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
 
           <Tooltip formatter={(value) => `${value} cases`} />
-          <Legend verticalAlign="bottom" height={36} />
+          <Legend verticalAlign="bottom" />
         </PieChart>
       </ResponsiveContainer>
     </div>
   );
 }
 
-export default DrillPerformancePie;
+export default Piechart;

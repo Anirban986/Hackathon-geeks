@@ -4,12 +4,13 @@ import "./LearningNav.css";
 import play from '../../../assets/play.svg'
 
 function LearningNav() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("All Topics");
   const [isMobile, setIsMobile] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  // Legal categories instead of generic learning
   const categories = [
-    { name: "All", icon: "📚" },
+    { name: "All Topics" },
     ...Array.from(
       new Map(
         modules.map((m) => [m.category, { name: m.category, icon: m.icon }])
@@ -18,11 +19,11 @@ function LearningNav() {
   ];
 
   const filtered =
-    activeCategory === "All"
+    activeCategory === "All Topics"
       ? modules
       : modules.filter((m) => m.category === activeCategory);
 
-  // Check screen size
+  // Responsive
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -30,25 +31,28 @@ function LearningNav() {
 
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
-
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Handle category selection
   const handleCategorySelect = (categoryName) => {
     setActiveCategory(categoryName);
-    setDropdownOpen(false); // Close dropdown after selection on mobile
+    setDropdownOpen(false);
   };
 
-  // Get active category object
   const activeCategoryObj = categories.find(cat => cat.name === activeCategory);
 
   return (
     <div className="dashboard">
+
+      {/* HEADER 
+      <div className="learning-header">
+        <h1>Know Your Rights</h1>
+        <p>Learn Indian Constitution, Fundamental Rights & Legal Awareness</p>
+      </div>
+*/}
       {/* Navigation */}
       <nav className="nav">
         {isMobile ? (
-          // Mobile Dropdown
           <div className="mobile-filter-dropdown">
             <button 
               className="dropdown-toggle"
@@ -57,9 +61,7 @@ function LearningNav() {
               <span className="icon">{activeCategoryObj?.icon}</span>
               <span>{activeCategory}</span>
               <small>
-                {activeCategory === "All"
-                  ? modules.length
-                  : modules.filter((m) => m.category === activeCategory).length}
+                {filtered.length} topics
               </small>
               <span className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`}>▼</span>
             </button>
@@ -75,7 +77,7 @@ function LearningNav() {
                     <span className="icon">{cat.icon}</span>
                     <span>{cat.name}</span>
                     <small>
-                      {cat.name === "All"
+                      {cat.name === "All Topics"
                         ? modules.length
                         : modules.filter((m) => m.category === cat.name).length}
                     </small>
@@ -85,7 +87,6 @@ function LearningNav() {
             )}
           </div>
         ) : (
-          // Desktop Navigation
           <ul>
             {categories.map((cat) => (
               <li
@@ -96,7 +97,7 @@ function LearningNav() {
                 <span className="icon">{cat.icon}</span>
                 <span>{cat.name}</span>
                 <small>
-                  {cat.name === "All"
+                  {cat.name === "All Topics"
                     ? modules.length
                     : modules.filter((m) => m.category === cat.name).length}
                 </small>
@@ -110,27 +111,41 @@ function LearningNav() {
       <div className="cards-learn">
         {filtered.map((m) => (
           <div className="learning-card" key={m.id}>
+
+            <div className="article-badge">
+              {m.article && <span>Article {m.article}</span>}
+            </div>
+
             <h3>{m.title}</h3>
             <p>{m.description}</p>
-            <small>Progress: {m.progress}%</small>
+
+            <small>You understand: {m.progress}%</small>
+
             <div className="progress">
               <div
                 className="progress-bar"
                 style={{ width: `${m.progress}%` }}
               ></div>
             </div>
-           
+
             <div className="meta">
               <span>⏱ {m.duration}</span>
-              <span>📘 {m.lessons} Lessons</span>
-              <span>👥 {m.users}</span>
+              <span>📘 {m.lessons} Concepts</span>
+              <span>👥 {m.users} learners</span>
               <span>⭐ {m.rating}</span>
             </div>
-            <span className={`level ${m.level.toLowerCase()}`}>{m.level}</span>
+
+            <span className={`level ${m.level.toLowerCase()}`}>
+              {m.level === "Beginner" ? "Basic Right" :
+               m.level === "Intermediate" ? "Important Law" :
+               "Legal Knowledge"}
+            </span>
+
             <div className="action">
               <img src={play} alt="" />
-              <div className="action-para">Start Learning</div>
+              <div className="action-para">Learn Your Right</div>
             </div>
+
           </div>
         ))}
       </div>

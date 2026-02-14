@@ -1,80 +1,82 @@
 import { useState } from "react";
 import CountUp from "react-countup";
-import "./Dashboard.css";
+import "./Casetracker.css";
 import download from '../../../assets/download.svg';
 import schedule from '../../../assets/schedule.svg';
-import TrendChart from "../TrendChart/TrendChart";
-import DrillPerformancePie from "../DrillPerformancePie/DrillPerformancePie";
-import CaseBarChart from "../BarChart/BarChart";
+import Trendchart from "../Trendchart/Trendchart";
+import Piechart from "../Piechart/Piechart";
+import Barchart from "../Barchart/Barchart";
 
-export default function Dashboard() {
+export default function Casetracker() {
   const [showPortal, setShowPortal] = useState(false);
   const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("low");
+  const [severity, setSeverity] = useState("normal");
 
-  // send legal notice instead of disaster alert
+  // Client sends query to advocate / court helpdesk
   const handleSend = async () => {
-    if (!message) return alert("Notice cannot be empty");
+    if (!message) return alert("Message cannot be empty");
 
     try {
-      const res = await fetch("http://localhost:5000/api/notices", {
+      const res = await fetch("http://localhost:5000/api/client-query", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, severity }),
+        body: JSON.stringify({ message, priority: severity }),
       });
 
       const data = await res.json();
-      console.log("📨 Notice issued:", data);
+      console.log("📨 Query submitted:", data);
 
       setMessage("");
-      setSeverity("low");
+      setSeverity("normal");
       setShowPortal(false);
     } catch (err) {
-      console.error("❌ Error issuing notice:", err);
+      console.error("❌ Error sending query:", err);
     }
   };
 
   return (
     <div className="dashboard">
+
+      {/* TOP HEADER */}
       <div className="dashboard-top">
         <div className="dashboard-top-segment1">
-          <h1>Judiciary Case Dashboard</h1>
-          <p>Monitor court case activity, hearings, and legal notices</p>
+          <h1>My Case Tracker</h1>
+          <p>Track your court cases, hearings and legal updates</p>
         </div>
 
         <div className="dashboard-top-segment2">
           <div className="export">
             <img src={download} alt="" />
-            <p>Download Case Report</p>
+            <p>Download Latest Order</p>
           </div>
 
           <div className="schedule-drill">
             <img src={schedule} alt="" />
-            <p>Schedule Hearing</p>
+            <p>View Next Hearing</p>
           </div>
 
           <div className="export" onClick={() => setShowPortal(true)}>
-            Issue Court Notice
+            Contact Advocate
           </div>
 
           {showPortal && (
             <div className="alert-portal-overlay">
               <div className="alert-portal">
-                <h2>Issue Legal Notice</h2>
+                <h2>Send Message to Advocate</h2>
 
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type court notice..."
+                  placeholder="Ask about your case..."
                 />
 
                 <select
                   value={severity}
                   onChange={(e) => setSeverity(e.target.value)}
                 >
-                  <option value="low">Routine</option>
-                  <option value="medium">Important</option>
-                  <option value="high">Urgent</option>
+                  <option value="normal">Normal</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="hearing">Before Hearing</option>
                 </select>
 
                 <div className="portal-buttons">
@@ -87,42 +89,42 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stat Cards */}
+      {/* SUMMARY CARDS */}
       <div className="cards">
         <div className="card blue">
-          <span>Pending Cases</span>
-          {/* <CountUp end={15432} duration={1.2} separator="," /> */}
+          <span>Total Cases</span>
+          <CountUp end={4} duration={1.2} />
         </div>
 
         <div className="card green">
-          <span>Cases Under Trial</span>
-          {/* <CountUp end={9321} duration={1.5} separator="," /> */}
+          <span>Upcoming Hearings</span>
+          <CountUp end={2} duration={1.5} />
         </div>
 
         <div className="card purple">
           <span>Disposed Cases</span>
-          {/* <CountUp end={12450} duration={1.8} separator="," /> */}
+          <CountUp end={1} duration={1.5} />
         </div>
 
         <div className="card yellow">
-          <span>Registered Advocates</span>
-          {/* <CountUp end={642} duration={1.2} /> */}
+          <span>Adjournments</span>
+          <CountUp end={6} duration={1.2} />
         </div>
       </div>
 
-      {/* Charts */}
+      {/* CHARTS */}
       <div className="charts">
         <div className="chart-card">
-          <TrendChart />
+          <Trendchart />
         </div>
 
         <div className="chart-card">
-          <DrillPerformancePie />
+          <Piechart />
         </div>
       </div>
 
       <div className="barchart">
-        <CaseBarChart />
+        <Barchart />
       </div>
     </div>
   );

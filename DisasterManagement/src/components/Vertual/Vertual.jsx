@@ -136,8 +136,8 @@ function Vertual() {
       transition={{ duration: 0.8, ease: easeInOut }}
       className='vertual'>
       <div className="vertual-top">
-        <h1>Virtual Drills</h1>
-        <p>Practice emergency procedures through interactive simulations</p>
+        <h1>Case Tracker</h1>
+        <p>All details of your cases at one places</p>
       </div>
 
       {/* Stats Section */}
@@ -145,12 +145,12 @@ function Vertual() {
         <div className="vertual-block-mid-member">
           <img src={vertual} alt="" />
           <h1>10</h1>
-          <p>Drills Completed</p>
+          <p>Active cases</p>
         </div>
         <div className="vertual-block-mid-member">
           <img src={score} alt="" />
           <h1>{Math.round((player.health + player.trust + player.supplies) / 3)}%</h1>
-          <p>Current Score</p>
+          <p>Resolved</p>
         </div>
         <div className="vertual-block-mid-member">
           <img src={clock} alt="" />

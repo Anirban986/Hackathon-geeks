@@ -11,36 +11,63 @@ import {
 } from "recharts";
 import "./TrendChart.css";
 
-
+// Monthly court performance data
 const data = [
-  { month: "Jan", earthquake: 75, fire: 60, flood: 50 },
-  { month: "Feb", earthquake: 82, fire: 65, flood: 55 },
-  { month: "Mar", earthquake: 78, fire: 70, flood: 60 },
-  { month: "Apr", earthquake: 85, fire: 72, flood: 68 },
-  { month: "May", earthquake: 90, fire: 80, flood: 70 },
-  { month: "Jun", earthquake: 88, fire: 82, flood: 75 },
-  { month: "Jul", earthquake: 92, fire: 85, flood: 80 },
-  { month: "Aug", earthquake: 95, fire: 88, flood: 82 },
-  { month: "Sep", earthquake: 91, fire: 83, flood: 78 },
-  { month: "Oct", earthquake: 87, fire: 79, flood: 73 },
-  { month: "Nov", earthquake: 89, fire: 81, flood: 76 },
-  { month: "Dec", earthquake: 93, fire: 86, flood: 79 },
+  { month: "Jan", filed: 1200, disposed: 950, pendingIncrease: 250 },
+  { month: "Feb", filed: 1350, disposed: 1000, pendingIncrease: 350 },
+  { month: "Mar", filed: 1280, disposed: 1100, pendingIncrease: 180 },
+  { month: "Apr", filed: 1420, disposed: 1150, pendingIncrease: 270 },
+  { month: "May", filed: 1500, disposed: 1300, pendingIncrease: 200 },
+  { month: "Jun", filed: 1600, disposed: 1400, pendingIncrease: 200 },
+  { month: "Jul", filed: 1700, disposed: 1500, pendingIncrease: 200 },
+  { month: "Aug", filed: 1750, disposed: 1550, pendingIncrease: 200 },
+  { month: "Sep", filed: 1650, disposed: 1500, pendingIncrease: 150 },
+  { month: "Oct", filed: 1580, disposed: 1450, pendingIncrease: 130 },
+  { month: "Nov", filed: 1620, disposed: 1500, pendingIncrease: 120 },
+  { month: "Dec", filed: 1800, disposed: 1650, pendingIncrease: 150 },
 ];
 
 function TrendChart() {
   return (
     <div className="trend-chart-container">
-      <h2 className="trend-chart-title">Disaster Drill Completion Rates (%)</h2>
+      <h2 className="trend-chart-title">Monthly Case Filing vs Disposal Trend</h2>
+
       <ResponsiveContainer width="100%" height={350}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
           <CartesianGrid strokeDasharray="3 3" />
+
           <XAxis dataKey="month" />
-          <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-          <Tooltip formatter={(value) => `${value}%`} />
+          <YAxis />
+
+          <Tooltip formatter={(value) => `${value} cases`} />
           <Legend />
-          <Line type="monotone" dataKey="earthquake" stroke="#FF4C4C" strokeWidth={3} dot={{ r: 4 }} />
-          <Line type="monotone" dataKey="fire" stroke="#FFA500" strokeWidth={3} dot={{ r: 4 }} />
-          <Line type="monotone" dataKey="flood" stroke="#4C9AFF" strokeWidth={3} dot={{ r: 4 }} />
+
+          <Line
+            type="monotone"
+            dataKey="filed"
+            name="Cases Filed"
+            stroke="#e74c3c"
+            strokeWidth={3}
+            dot={{ r: 4 }}
+          />
+
+          <Line
+            type="monotone"
+            dataKey="disposed"
+            name="Cases Disposed"
+            stroke="#2ecc71"
+            strokeWidth={3}
+            dot={{ r: 4 }}
+          />
+
+          <Line
+            type="monotone"
+            dataKey="pendingIncrease"
+            name="Pending Growth"
+            stroke="#f1c40f"
+            strokeWidth={3}
+            dot={{ r: 4 }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

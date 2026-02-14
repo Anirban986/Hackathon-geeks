@@ -86,8 +86,8 @@ export default function Alerts() {
     <>
       <div className="alert-top-login">
         <div className="alert-top-login-seg1">
-          <h1>Alert Center</h1>
-          <p>Real-time disaster alerts and warnings </p>
+          <h1>Importent events and notices</h1>
+          <p>Stay updated with every legal news and events </p>
         </div>
         <div className="alert-top-login-seg2">
          <img src={sos} alt="" />

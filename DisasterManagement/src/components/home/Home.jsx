@@ -80,8 +80,8 @@ function Home() {
                 </div>
                 <div className="section-items">
                     <img src={achievement} alt="" />
-                    <h1>90%</h1>
-                    <p>Satisfaction rate</p>
+                    <h1>30%</h1>
+                    <p>Cases Resolved</p>
                 </div>
             </div>
 

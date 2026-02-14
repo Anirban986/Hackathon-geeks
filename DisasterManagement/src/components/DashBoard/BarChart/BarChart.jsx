@@ -11,54 +11,62 @@ import {
 } from "recharts";
 import "./BarChart.css";
 
-
+// Case type wise filing vs disposal
 const data = [
-  { drill: "Earthquake", conducted: 20, completed: 17 },
-  { drill: "Fire Safety", conducted: 18, completed: 14 },
-  { drill: "Cyclone", conducted: 15, completed: 10 },
-  { drill: "Heat Waves", conducted: 12, completed: 9 },
-  { drill: "Flood Preparedness", conducted: 22, completed: 18 },
+  { type: "Civil", filed: 420, disposed: 310 },
+  { type: "Criminal", filed: 380, disposed: 250 },
+  { type: "Family", filed: 210, disposed: 180 },
+  { type: "Property", filed: 260, disposed: 190 },
+  { type: "Corporate", filed: 150, disposed: 120 },
 ];
-
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
-    const { conducted, completed } = payload[0].payload;
-    const percentage = ((completed / conducted) * 100).toFixed(1);
+    const { filed, disposed } = payload[0].payload;
+    const percentage = ((disposed / filed) * 100).toFixed(1);
+
     return (
       <div className="custom-tooltip">
-        <p className="tooltip-title">{label}</p>
-        <p>Conducted: <span>{conducted}</span></p>
-        <p>Completed: <span>{completed}</span></p>
-        <p>Completion Rate: <span>{percentage}%</span></p>
+        <p className="tooltip-title">{label} Cases</p>
+        <p>Filed: <span>{filed}</span></p>
+        <p>Disposed: <span>{disposed}</span></p>
+        <p>Disposal Rate: <span>{percentage}%</span></p>
       </div>
     );
   }
   return null;
 };
 
-const DisasterCompletionChart = () => {
-  
+// 🔹 renamed component
+const CaseBarChart = () => {
   const chartData = data.map(d => ({
     ...d,
-    completion: ((d.completed / d.conducted) * 100).toFixed(1),
+    disposalRate: ((d.disposed / d.filed) * 100).toFixed(1),
   }));
 
   return (
     <div className="chart-container">
-      <h2 className="chart-title">Disaster Drill Completion Rates</h2>
+      <h2 className="chart-title">Case Type Disposal Efficiency</h2>
+
       <ResponsiveContainer width="100%" height={400}>
         <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
-          <XAxis dataKey="drill" tick={{ fontSize: 14, fill: "#555" }} />
-          <YAxis tick={{ fontSize: 14, fill: "#555" }} domain={[0, 100]} />
+          <XAxis dataKey="type" />
+          <YAxis domain={[0, 100]} />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar dataKey="completion" fill="#3498db" barSize={50} radius={[8, 8, 0, 0]} />
+
+          <Bar
+            dataKey="disposalRate"
+            name="Disposal Rate (%)"
+            fill="#2c3e50"
+            barSize={50}
+            radius={[8, 8, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 };
 
-export default DisasterCompletionChart;
+export default CaseBarChart;

@@ -9,14 +9,14 @@
 .learning-top h1{
     font-size: 70px;
     margin-bottom: 20px;
-    background: linear-gradient(276deg, blue, rgb(255, 4, 4));
+    background: linear-gradient(276deg, rgb(0, 255, 38), rgb(255, 191, 0));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent; 
 }
 .learning-top p{
    font-size: 18px;
-    color: rgba(86, 86, 86, 0.922); 
+   color: rgb(203, 203, 203);
 }
 .learning-top-blocks{
     display: flex;
@@ -84,10 +84,13 @@
 .learning-top-login-seg1 h1{
     font-size: 40px;
     margin-bottom: 10px;
-    background: linear-gradient(276deg, blue, rgb(255, 4, 4));
+     background: linear-gradient(276deg, rgb(0, 255, 38), rgb(255, 191, 0));
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent; 
+}
+.learning-top-login-seg1 p{
+    color: white;
 }
 .disastrabot{
     padding: 0 50px;

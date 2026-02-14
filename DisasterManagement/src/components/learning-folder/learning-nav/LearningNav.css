@@ -1,11 +1,12 @@
 /* NAVBAR */
 
 .nav {
-    display: flex;
+   display: flex;
     justify-content: center;
-    background: #fff;
+    background: #ffffff38;
     border-bottom: 1px solid #eee;
     padding: 12px 20px;
+    border-radius: 10px;
 }
 
 .nav ul {
@@ -25,6 +26,7 @@
     padding: 6px 10px;
     border-radius: 6px;
     transition: background 0.2s ease;
+    color: white;
 }
 
 .nav ul li.active {

@@ -67,24 +67,24 @@ const handleLogout = () => {
           </li>
         </NavLink>
 
-        <NavLink to="/learn" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+      <NavLink to="/learn" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
               {/*<img className="navmenu-img" src={learn} alt="" />*/}
-              <h1>Learn</h1>
+              <h1>Services</h1>
             </div>
           </li>
         </NavLink>
 
-        <NavLink to="/vertual" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+      {/*  <NavLink to="/vertual" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
-              {/*<img className="navmenu-img" src={vertual} alt="" />*/}
-              <h1>Virtual Drills</h1>
+              <img className="navmenu-img" src={vertual} alt="" />
+              <h1>Cases</h1>
             </div>
           </li>
         </NavLink>
-
+*/}
         <NavLink to="/alerts" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
@@ -94,15 +94,15 @@ const handleLogout = () => {
           </li>
         </NavLink>
 
-        <NavLink to="/safty" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+   {/*    <NavLink to="/safty" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
-             {/* <img className="navmenu-img" src={game} alt="" />*/}
+              <img className="navmenu-img" src={game} alt="" />
               <h1>Survival Quizes</h1>
             </div>
           </li>
         </NavLink>
-
+*/}
         <NavLink to="/emergency" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
@@ -111,13 +111,22 @@ const handleLogout = () => {
             </div>
           </li>
         </NavLink>
-
+          {user?.role==="student" && (
+        <NavLink to="/Casetracker" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+          <li className="list-items">
+            <div className="navmenu-list">
+              {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
+              <h1>Cases</h1>
+            </div>
+          </li>
+        </NavLink>
+       )}     
 
        {user?.role==="admin" && (
         <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
-              <img className="navmenu-img" src={dashboard} alt="" />
+              {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
               <h1>Dashboard</h1>
             </div>
           </li>

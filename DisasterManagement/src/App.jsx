@@ -15,6 +15,7 @@ import Community from './components/communtiy/Community'
 import LoginParent from './components/Signup/LoginParent'
 import LoginStudent from './components/Signup/LoginStudent'
 import LoginTeacher from './components/Signup/LoginTeacher'
+import Casetracker from './components/Cases/Casetracker/Casetracker'
 function App() {
   const [count, setCount] = useState(0)
    const [showSignup, setShowSignup] = useState(false)
@@ -25,6 +26,7 @@ function App() {
       <Route path='/' element={<Home/>}/>
       <Route path='/Learn' element={<Learn/>}/>
       <Route path='/Vertual' element={<Vertual/>}/>
+      <Route path='/Casetracker' element={<Casetracker/>}/>
       <Route path='/Alerts' element={<Alerts/>}/>
       <Route path='/Safty' element={<Safty/>}/>
       <Route path='/Emergency' element={<Emergency/>}/>
