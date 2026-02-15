@@ -47,7 +47,7 @@ function SignUp({ isOpen, onClose }) {
           <button onClick={() => setActiveTab("Judge")} className={activeTab === "Judge" ? "active" : ""}>
             Judge
           </button>
-          <button onClick={() => setActiveTab("admin")} className={activeTab === "admin" ? "active" : ""}>
+          <button onClick={() => setActiveTab("Admin")} className={activeTab === "Admin" ? "active" : ""}>
             Admin
           </button>
         </div>

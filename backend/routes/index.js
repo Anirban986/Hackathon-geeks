@@ -52,22 +52,21 @@ function isAdmin(req, res, next) {
 
 router.post("/register/client", async (req, res) => {
   try {
-
     const { name, email, password } = req.body;
 
-
+    // check existing user
     const existingClient = await Client.findOne({ email });
     if (existingClient) {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-
+    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // generate otp
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-
-
-
+    // save user
     const newClient = new Client({
       name,
       email,
@@ -75,55 +74,61 @@ router.post("/register/client", async (req, res) => {
       points: 0,
       level: "Bronze",
       completed: 0,
-      //otp
+      otp,
+      otpExpiry: Date.now() + 5 * 60 * 1000, // 5 min expiry
+      isVerified: false
     });
-
 
     await newClient.save();
 
-
-
-
+    // send email
     await sendverificationcode(email, otp);
 
-    // res.render("verifyotp", { email , userType:"Client"});
-
-
-    /* res.redirect("/verify-otp");
-   res.status(201).json({ 
-   message: "Student registered successfully! Verification code sent to email.",
-   redirect: "/verify-otp"
- });*/
-
-    res.status(201).json({ message: "Student registered successfully! Verification code sent to email." });
+    // send response to React
+    return res.status(201).json({
+      success: true,
+      message: "OTP sent to email",
+      email: email
+    });
 
   } catch (err) {
     console.error("Registration error:", err);
-    res.render("registerClient", { error: "Something went wrong during registration" });;
+    return res.status(500).json({ error: "Registration failed" });
   }
 });
 
-/*router.post("/verify-otp/client", async (req, res) => {
+
+router.post("/verify-otp/client", async (req, res) => {
   try {
-    const{email,otp}=req.body;
-    const result=await verifyemailclient(email,otp); // pass req & res directly
+    const { email, otp } = req.body;
 
-    if (result.success) {
-    res.send("Email verified successfully! You can now login.");
-  } else {
-    res.render("verifyotp", {email,userType:"Client",error: result.message });
-  }
-  }
-  catch (err) {
-  console.error(err);
-  res.render("verifyotp", {
-    email: req.body.email,
-    userType: "Client",
-    error: "Internal server error"
-  });
-}
+    const client = await Client.findOne({ email });
+    if (!client)
+      return res.status(404).json({ error: "User not found" });
 
-});*/
+    if (client.isVerified)
+      return res.status(400).json({ error: "Already verified" });
+
+    if (client.otp !== otp)
+      return res.status(400).json({ error: "Invalid OTP" });
+
+    if (client.otpExpiry < Date.now())
+      return res.status(400).json({ error: "OTP expired" });
+
+    client.isVerified = true;
+    client.otp = null;
+    client.otpExpiry = null;
+
+    await client.save();
+
+    res.json({ success: true, message: "Email verified successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Verification failed" });
+  }
+});
+
 
 
 
@@ -239,21 +244,37 @@ router.post("/register/lawyer", async (req, res) => {
   }
 });
 
-/*router.post("/verify-otp/lawyer", async (req, res) => {
+router.post("/verify-otp/lawyer", async (req, res) => {
   try {
-    const{email,otp}=req.body;
-    const result=await verifyemaillawyer(email,otp); 
+    const { email, otp } = req.body;
 
-    if (result.success) {
-    res.send("Email verified successfully! You can now login.");
-  } else {
-    res.render("verifyotp", {email,userType:"Lawyer",error: result.message });
+    const lawyer = await Lawyer.findOne({ email });
+    if (!lawyer)
+      return res.status(404).json({ error: "User not found" });
+
+    if (lawyer.isVerified)
+      return res.status(400).json({ error: "Already verified" });
+
+    if (lawyer.otp !== otp)
+      return res.status(400).json({ error: "Invalid OTP" });
+
+    if (lawyer.otpExpiry < Date.now())
+      return res.status(400).json({ error: "OTP expired" });
+
+    lawyer.isVerified = true;
+    lawyer.otp = null;
+    lawyer.otpExpiry = null;
+
+    await lawyer.save();
+
+    res.json({ success: true, message: "Email verified successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Verification failed" });
   }
-  }
-   catch (err) {
-    res.render("verifyotp", {email: req.body.email, error:"Internal server error"});
-  }
-});*/
+});
+
 
 
 
@@ -492,9 +513,9 @@ router.post("/register/admin", async (req, res) => {
 
 
 
-router.get("/login/admin", (req, res) => {
+/*router.get("/login/admin", (req, res) => {
   res.render("login", { error: null, userType: "admin" });
-});
+});*/
 
 router.post("/login/admin", async (req, res) => {
   try {
@@ -502,12 +523,12 @@ router.post("/login/admin", async (req, res) => {
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      return res.render("login", { error: "Email not registered", userType: "admin" });
+      return res.status(400).json({ error: "Email not registered" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.render("login", { error: "Incorrect password", userType: "admin" });
+      return res.status(400).json({ error: "Incorrect password" });
     }
 
     const token = jwt.sign(
@@ -521,24 +542,19 @@ router.post("/login/admin", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, { httpOnly: true });
+    // send JSON instead of redirect
+    res.json({
+      success: true,
+      token,
+      name: admin.name,
+      role: "admin"
+    });
 
-    res.redirect("/profile/admin");
   } catch (err) {
     console.error(err);
-    res.render("login", { error: "Something went wrong", userType: "admin" });
+    res.status(500).json({ error: "Something went wrong" });
   }
 });
-
-
-router.get("/profile/admin", authenticateToken, (req, res) => {
-  if (req.user.role !== "admin") return res.status(403).send("Access Denied");
-  res.render("profile", {
-    name: req.user.name,
-    userType: "admin"
-  });
-});
-
 
 //---------------------------------logout admin------------------
 

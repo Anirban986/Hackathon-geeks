@@ -147,7 +147,7 @@ function Navbar() {
         )}
 
 
-        {user?.role === "Admin" && (
+        {user?.role === "admin" && (
           <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <li className="list-items">
               <div className="navmenu-list">

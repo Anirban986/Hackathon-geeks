@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
 import "./Auth.css";
+import VerifyClient from "./VerifyClient";
 
 function RegisterStudent() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-  
   });
 
   const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,8 +31,9 @@ function RegisterStudent() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(data.message);
-        setSuccess(true);
+        // 👉 instead of showing message → open OTP popup
+        setRegisteredEmail(formData.email);
+        setShowOtp(true);
       } else {
         setMessage(data.error || "Registration failed");
       }
@@ -46,12 +47,48 @@ function RegisterStudent() {
     <div>
       <form className="auth-form" onSubmit={handleSubmit}>
         <h2>Register as Client</h2>
-        <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          required
+        />
+
         <button type="submit">Register</button>
       </form>
+
       <p className="message">{message}</p>
+
+      {/* OTP POPUP */}
+      {showOtp && (
+        <VerifyClient
+          email={registeredEmail}
+          onClose={(verified) => {
+            setShowOtp(false);
+            if (verified) {
+              setMessage("✅ Registration complete. You can login now.");
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

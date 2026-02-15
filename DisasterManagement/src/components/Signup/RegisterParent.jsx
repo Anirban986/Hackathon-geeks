@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
 import "./Auth.css";
-
+import VerifyLawyer from "./VerifyLawyer";
 function RegisterParent() {
   const [formData, setFormData] = useState({
     name: "",
@@ -11,8 +11,8 @@ function RegisterParent() {
   });
 
   const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState(false);
-
+  const [showOtp, setShowOtp] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -38,8 +38,9 @@ function RegisterParent() {
       }
 
       if (response.ok) {
-        setMessage(data.message);
-        setSuccess(true);
+         // 👉 instead of showing message → open OTP popup
+        setRegisteredEmail(formData.email);
+        setShowOtp(true);
       } else {
         setMessage(data.error || "Registration failed");
       }
@@ -60,6 +61,19 @@ function RegisterParent() {
         <button type="submit">Register</button>
       </form>
       <p className="message">{message}</p>
+
+      {/* OTP POPUP */}
+            {showOtp && (
+              <VerifyLawyer
+                email={registeredEmail}
+                onClose={(verified) => {
+                  setShowOtp(false);
+                  if (verified) {
+                    setMessage("✅ Registration complete. You can login now.");
+                  }
+                }}
+              />
+            )}
     </div>
   );
 }

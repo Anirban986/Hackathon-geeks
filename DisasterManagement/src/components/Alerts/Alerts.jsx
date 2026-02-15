@@ -66,8 +66,8 @@ export default function Alerts() {
         className='alerts'
       >
         <div className="alert-top">
-          <h1>Alert Center</h1>
-          <p>Real-time disaster alerts and warnings</p>
+          <h1>Importent events and notices</h1>
+          <p>Stay updated with every legal news and events</p>
         </div>
 
         <div className="alert-bottom">
