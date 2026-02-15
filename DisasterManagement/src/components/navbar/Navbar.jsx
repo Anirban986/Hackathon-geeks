@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import './Navbar.css';
 import home from '../../assets/home.svg';
 import alerts from '../../assets/alerts.svg';
@@ -10,64 +10,65 @@ import dashboard from '../../assets/dashboard.svg';
 import { NavLink } from 'react-router';
 import SignUp from '../Signup/Signup'; // adjust path
 import logo5 from '../../assets/logo5.jpg';
+import Verdictnexuslogo from '../../assets/Verdictnexuslogo.svg'
 function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [user, setUser] = useState(null); // store logged-in user info
+  const [user, setUser] = useState(null); // store logged-in user info
 
   // Check localStorage on mount
- useEffect(() => {
-  const checkUser = () => {
-    const token = localStorage.getItem("token");
-    const userName = localStorage.getItem("userName");
-    const role = localStorage.getItem("role"); // ✅ get role
-    if (token && userName && role) {
-      setUser({ name: userName , role });
-    } else {
-      setUser(null);
-    }
+  useEffect(() => {
+    const checkUser = () => {
+      const token = localStorage.getItem("token");
+      const userName = localStorage.getItem("userName");
+      const role = localStorage.getItem("role"); // ✅ get role
+      if (token && userName && role) {
+        setUser({ name: userName, role });
+      } else {
+        setUser(null);
+      }
+    };
+
+    // Run on mount
+    checkUser();
+
+    // Listen for login/logout events
+    window.addEventListener("login", checkUser);
+    window.addEventListener("logout", checkUser);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("login", checkUser);
+      window.removeEventListener("logout", checkUser);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("role"); // ✅ clear role
+    setUser(null);
+    window.dispatchEvent(new Event("logout")); // notify navbar
+    window.location.href = "/";
   };
-
-  // Run on mount
-  checkUser();
-
-  // Listen for login/logout events
-  window.addEventListener("login", checkUser);
-  window.addEventListener("logout", checkUser);
-
-  // Clean up
-  return () => {
-    window.removeEventListener("login", checkUser);
-    window.removeEventListener("logout", checkUser);
-  };
-}, []);
-
-const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("userName");
-  localStorage.removeItem("role"); // ✅ clear role
-  setUser(null);
-  window.dispatchEvent(new Event("logout")); // notify navbar
-  window.location.href = "/";
-};
 
 
   return (
     <div className="navbar">
-     <div className="logo">
-        <img src={logo5} alt="" />
-      </div> 
+      <div className="logo">
+        <img src={Verdictnexuslogo} alt="" />
+      </div>
 
       <ul className="navmenu">
         <NavLink to="/" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
-             {/* <img className="navmenu-img" src={home} alt="" />*/}
+              {/* <img className="navmenu-img" src={home} alt="" />*/}
               <h1>Home</h1>
             </div>
           </li>
         </NavLink>
 
-      <NavLink to="/learn" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+        <NavLink to="/learn" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
               {/*<img className="navmenu-img" src={learn} alt="" />*/}
@@ -76,7 +77,7 @@ const handleLogout = () => {
           </li>
         </NavLink>
 
-     {/*  <NavLink to="/AboutUs" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+        {/*  <NavLink to="/AboutUs" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
               <img className="navmenu-img" src={vertual} alt="" />
@@ -94,7 +95,7 @@ const handleLogout = () => {
           </li>
         </NavLink>
 
-   {/*    <NavLink to="/safty" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+        {/*    <NavLink to="/safty" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <li className="list-items">
             <div className="navmenu-list">
               <img className="navmenu-img" src={game} alt="" />
@@ -111,32 +112,56 @@ const handleLogout = () => {
             </div>
           </li>
         </NavLink>
-          {user?.role==="student" && (
-        <NavLink to="/Casetracker" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          <li className="list-items">
-            <div className="navmenu-list">
-              {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
-              <h1>Cases</h1>
-            </div>
-          </li>
-        </NavLink>
-       )}     
 
-       {user?.role==="admin" && (
-        <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          <li className="list-items">
-            <div className="navmenu-list">
-              {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
-              <h1>Dashboard</h1>
-            </div>
-          </li>
-        </NavLink>
-       )}     
-       
+        {user?.role === "Client" && (
+          <NavLink to="/Casetracker" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <li className="list-items">
+              <div className="navmenu-list">
+                {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
+                <h1>Cases</h1>
+              </div>
+            </li>
+          </NavLink>
+        )}
+
+        {user?.role === "Lawyer" && (
+          <NavLink to="/Casetracker" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <li className="list-items">
+              <div className="navmenu-list">
+                {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
+                <h1>Cases</h1>
+              </div>
+            </li>
+          </NavLink>
+        )}
+
+        {user?.role === "Judge" && (
+          <NavLink to="/Casetracker" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <li className="list-items">
+              <div className="navmenu-list">
+                {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
+                <h1>Cases</h1>
+              </div>
+            </li>
+          </NavLink>
+        )}
+
+
+        {user?.role === "Admin" && (
+          <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <li className="list-items">
+              <div className="navmenu-list">
+                {/*<img className="navmenu-img" src={dashboard} alt="" />*/}
+                <h1>Dashboard</h1>
+              </div>
+            </li>
+          </NavLink>
+        )}
+
       </ul>
 
       <div className="navbar-right">
-        {user && <span className="user-name"> {user.name}</span>}
+        {user && <span className="user-name"> {user.name} / {user.role}</span>}
         {user ? (
           <div className="btn logout-btn" onClick={handleLogout}>Log Out</div>
         ) : (

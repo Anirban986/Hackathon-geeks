@@ -66,22 +66,23 @@ function Home() {
                 <div className="section-items">
                     <img src={school} alt="" />
                     <h1>1234+</h1>
-                    <p>Cases solved this year</p>
+                    <p>Cases registered this month</p>
                 </div>
                 <div className="section-items">
-                    <img src={student} alt="" />
+                    <img src={school} alt="" />
                     <h1>1234+</h1>
-                    <p>Judges serving accross al courts</p>
+                    <p>Cases in District Court</p>
+                </div>
+                
+                <div className="section-items">
+                    <img src={school} alt="" />
+                    <h1>1234+</h1>
+                    <p>Cases in High Court</p>
                 </div>
                 <div className="section-items">
-                    <img src={trophy} alt="" />
-                    <h1>24/7</h1>
-                    <p>Online access</p>
-                </div>
-                <div className="section-items">
-                    <img src={achievement} alt="" />
-                    <h1>30%</h1>
-                    <p>Cases Resolved</p>
+                    <img src={school} alt="" />
+                    <h1>1234+</h1>
+                    <p>Cases in Supreme Court</p>
                 </div>
             </div>
 

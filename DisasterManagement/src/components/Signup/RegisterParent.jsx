@@ -7,7 +7,7 @@ function RegisterParent() {
     name: "",
     email: "",
     password: "",
-    studentEmail: "",
+    registration: "",
   });
 
   const [message, setMessage] = useState("");
@@ -22,13 +22,20 @@ function RegisterParent() {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:5000/register/parent", {
+      const response = await fetch("http://localhost:3000/register/lawyer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Server returned non-JSON response:\n" + text);
+      }
 
       if (response.ok) {
         setMessage(data.message);
@@ -45,11 +52,11 @@ function RegisterParent() {
   return (
     <div>
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Register as Parent</h2>
+        <h2>Register as Lawyer</h2>
         <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
         <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
         <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-        <input type="email" name="studentEmail" placeholder="Student's Email" onChange={handleChange} required />
+        <input type="text" name="registration" placeholder=" BAR registration number" onChange={handleChange} required />
         <button type="submit">Register</button>
       </form>
       <p className="message">{message}</p>

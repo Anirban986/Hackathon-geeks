@@ -18,7 +18,7 @@ function LoginParent() {
         setMessage("");
 
         try {
-            const response = await fetch("http://localhost:5000/login/parent", {
+            const response = await fetch("http://localhost:3000/login/lawyer", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -30,7 +30,7 @@ function LoginParent() {
 
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("userName", data.name); // save user name
-                localStorage.setItem("role", "parent");
+                localStorage.setItem("role", "Lawyer");
                 // Dispatch login event
                 window.dispatchEvent(new Event("login"));
 
@@ -49,7 +49,7 @@ function LoginParent() {
     return (
         <div className="auth-container">
             <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Parent Login</h2>
+                <h2>Lawyer Login</h2>
                 <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
                 <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
                 <button type="submit">Login</button>

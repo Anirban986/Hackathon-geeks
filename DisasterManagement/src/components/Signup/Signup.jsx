@@ -11,7 +11,7 @@ import AdminLogin from "./AdminLogin";
 
 function SignUp({ isOpen, onClose }) {
   const [mainTab, setMainTab] = useState("register"); // "register" or "login"
-  const [activeTab, setActiveTab] = useState("student"); // student/parent/teacher
+  const [activeTab, setActiveTab] = useState("Client"); // student/parent/teacher
 
   if (!isOpen) return null;
 
@@ -23,13 +23,13 @@ function SignUp({ isOpen, onClose }) {
         {/* Main Tabs: Register / Login */}
         <div className="tab-buttons">
           <button
-            onClick={() => { setMainTab("register"); setActiveTab("student"); }}
+            onClick={() => { setMainTab("register"); setActiveTab("Client"); }}
             className={mainTab === "register" ? "active" : ""}
           >
             Register
           </button>
           <button
-            onClick={() => { setMainTab("login"); setActiveTab("student"); }}
+            onClick={() => { setMainTab("login"); setActiveTab("Client"); }}
             className={mainTab === "login" ? "active" : ""}
           >
             Login
@@ -38,14 +38,14 @@ function SignUp({ isOpen, onClose }) {
 
         {/* Sub Tabs: Student / Parent / Teacher */}
         <div className="tab-buttons">
-          <button onClick={() => setActiveTab("student")} className={activeTab === "student" ? "active" : ""}>
-            Student
+          <button onClick={() => setActiveTab("Client")} className={activeTab === "Client" ? "active" : ""}>
+            Client
           </button>
-          <button onClick={() => setActiveTab("parent")} className={activeTab === "parent" ? "active" : ""}>
-            Parent
+          <button onClick={() => setActiveTab("Lawyer")} className={activeTab === "Lawyer" ? "active" : ""}>
+            Lawyer
           </button>
-          <button onClick={() => setActiveTab("teacher")} className={activeTab === "teacher" ? "active" : ""}>
-            Teacher
+          <button onClick={() => setActiveTab("Judge")} className={activeTab === "Judge" ? "active" : ""}>
+            Judge
           </button>
           <button onClick={() => setActiveTab("admin")} className={activeTab === "admin" ? "active" : ""}>
             Admin
@@ -54,14 +54,14 @@ function SignUp({ isOpen, onClose }) {
 
         {/* Tab Content */}
         <div className="tab-content">
-          {mainTab === "register" && activeTab === "student" && <RegisterStudent />}
-          {mainTab === "register" && activeTab === "parent" && <RegisterParent />}
-          {mainTab === "register" && activeTab === "teacher" && <RegisterTeacher />}
-          {mainTab === "register" && activeTab === "admin" &&   <AdminRegister/>}
-          {mainTab === "login" && activeTab === "student" && <LoginStudent />}
-          {mainTab === "login" && activeTab === "parent" && <LoginParent />}
-          {mainTab === "login" && activeTab === "teacher" && <LoginTeacher />}
-          {mainTab === "login" && activeTab === "admin" && <AdminLogin/>}
+          {mainTab === "register" && activeTab === "Client" && <RegisterStudent />}
+          {mainTab === "register" && activeTab === "Lawyer" && <RegisterParent />}
+          {mainTab === "register" && activeTab === "Judge" && <RegisterTeacher />}
+          {mainTab === "register" && activeTab === "Admin" &&   <AdminRegister/>}
+          {mainTab === "login" && activeTab === "Client" && <LoginStudent />}
+          {mainTab === "login" && activeTab === "Lawyer" && <LoginParent />}
+          {mainTab === "login" && activeTab === "Judge" && <LoginTeacher />}
+          {mainTab === "login" && activeTab === "Admin" && <AdminLogin/>}
         </div>
       </div>
     </div>

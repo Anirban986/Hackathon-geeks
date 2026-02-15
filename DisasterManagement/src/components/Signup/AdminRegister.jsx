@@ -20,7 +20,7 @@ function AdminRegister() {
   setMessage("");
 
   try {
-    const response = await fetch("http://localhost:5000/register/admin", {
+    const response = await fetch("http://localhost:3000/register/admin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),

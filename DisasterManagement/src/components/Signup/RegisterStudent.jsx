@@ -5,10 +5,9 @@ import "./Auth.css";
 function RegisterStudent() {
   const [formData, setFormData] = useState({
     name: "",
-    username: "",
     email: "",
     password: "",
-    institutionName: "",
+  
   });
 
   const [message, setMessage] = useState("");
@@ -23,7 +22,7 @@ function RegisterStudent() {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:5000/register/student", {
+      const response = await fetch("http://localhost:3000/register/client", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -46,12 +45,10 @@ function RegisterStudent() {
   return (
     <div>
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Register as Student</h2>
+        <h2>Register as Client</h2>
         <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
-        <input type="text" name="username" placeholder="Username" onChange={handleChange} required />
         <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
         <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-        <input type="text" name="institutionName" placeholder="Institution Name" onChange={handleChange} required />
         <button type="submit">Register</button>
       </form>
       <p className="message">{message}</p>

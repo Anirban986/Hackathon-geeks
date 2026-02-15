@@ -14,6 +14,7 @@ export default function Casetracker() {
   const [showPortal, setShowPortal] = useState(false);      // advocate message
   const [showCaseStatus, setShowCaseStatus] = useState(false); // case status page
   const [message, setMessage] = useState("");
+  const role = localStorage.getItem("role");
   const [severity, setSeverity] = useState("normal");
 
   const handleSend = async () => {
@@ -62,14 +63,16 @@ export default function Casetracker() {
           <div className="schedule-drill" onClick={() => setShowCaseStatus(true)}>
             <p>Case Status</p>
           </div>
-
+    
           {/* ⭐ CONNECT ADVOCATE */}
-          <div className="export" onClick={() => setShowLawyers(true)}>
+          {role=="Client" &&(
+            <div className="export" onClick={() => setShowLawyers(true)}>
             Connect Advocate
           </div>
+          )}
         </div>
       </div>
-
+      
       {showLawyers && (
         <LawyersModal close={() => setShowLawyers(false)} />
       )}

@@ -7,8 +7,8 @@ function RegisterTeacher() {
     name: "",
     email: "",
     password: "",
-    institutionName: "",
-    institutionCode: "",
+    courtName: "",
+    barRegistrationNumber: "",
   });
 
   const [message, setMessage] = useState("");
@@ -23,7 +23,7 @@ function RegisterTeacher() {
     setMessage("");
 
     try {
-      const response = await fetch("http://localhost:5000/register/teacher", {
+      const response = await fetch("http://localhost:3000/register/judge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -45,12 +45,12 @@ function RegisterTeacher() {
 
   return (
     <form onSubmit={handleSubmit} className="auth-form">
-      <h2>Register as Teacher</h2>
+      <h2>Register as Judge</h2>
       <input type="text" name="name" placeholder="Full Name" onChange={handleChange} required />
       <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
       <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-      <input type="text" name="institutionName" placeholder="Institution Name" onChange={handleChange} required />
-      <input type="text" name="institutionCode" placeholder="Institution Code" onChange={handleChange} required />
+      <input type="text" name="courtName" placeholder="Court Name" onChange={handleChange} required />
+      <input type="text" name="barRegistrationNumber" placeholder="Bar Registration code" onChange={handleChange} required />
       <button type="submit">Register</button>
       <p className="message">{message}</p>
     </form>

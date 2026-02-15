@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { io } from "socket.io-client";
+//import { io } from "socket.io-client";
 import "./Alerts.css";
 import sos from '../../assets/sos.svg'
 import alert from '../../assets/alert.svg'
-const socket = io("http://localhost:5000");
+//const socket = io("http://localhost:5000");
 import { motion } from "framer-motion"
 export default function Alerts() {
   const [user, setUser] = useState(null);

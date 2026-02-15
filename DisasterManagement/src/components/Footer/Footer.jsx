@@ -5,7 +5,7 @@ function Footer() {
     <div className='footer'>
         <div className='footer-top'>
             <div className='footer-col'>
-                <h1>Simpligal</h1>
+                <h1>Verdict Nexus</h1>
                 <p className='footer-p'>Committed to upholding justice and serving the nation with integrity, transparency, and dedication.</p>
             </div>
             <div className="footer-col">

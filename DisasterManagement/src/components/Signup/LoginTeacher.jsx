@@ -18,7 +18,7 @@ function LoginTeacher() {
         setMessage("");
 
         try {
-            const response = await fetch("http://localhost:5000/login/teacher", {
+            const response = await fetch("http://localhost:3000/login/judge", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -30,7 +30,7 @@ function LoginTeacher() {
 
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("userName", data.name); // save user name
-                localStorage.setItem("role", "teacher");
+                localStorage.setItem("role", "judge");
                 // Dispatch login event
                 window.dispatchEvent(new Event("login"));
 
@@ -49,7 +49,7 @@ function LoginTeacher() {
     return (
         <div className="auth-container">
             <form className="auth-form" onSubmit={handleSubmit}>
-                <h2>Teacher Login</h2>
+                <h2>Judge Login</h2>
                 <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
                 <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
                 <button type="submit">Login</button>
