@@ -6,27 +6,32 @@ const jwt = require("jsonwebtoken");
 
 
 function authenticateToken(req, res, next) {
- 
-  const token = req.cookies.token || req.headers["authorization"]?.split(" ")[1];
+
+  let token = null;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
   if (!token) return res.status(401).json({ message: "Access Denied" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: "Invalid Token" });
-    req.user = user; 
+    req.user = user;
     next();
   });
 }
 
 
 
-const { Client, Lawyer, Judge, Admin, Case, Judgement,} = require("./users");
-const { sendverificationcode, verifyemailclient, verifyemaillawyer,verifyemailjudge } = require("./mailer");
+
+const { Client, Lawyer, Judge, Admin, Case, Judgement, } = require("./users");
+const { sendverificationcode, verifyemailclient, verifyemaillawyer, verifyemailjudge } = require("./mailer");
 
 
 
-router.get('/', function(req, res) {
-  res.render('index',{title:"Debasish"}) ;
+router.get('/', function (req, res) {
+  res.render('index', { title: "Debasish" });
 });
 
 
@@ -40,29 +45,29 @@ function isAdmin(req, res, next) {
 
 //----------------------------------------register client--------------------------------------------------------
 
-router.get("/register/client",async(req,res)=>{
+/*router.get("/register/client",async(req,res)=>{
   res.render("registerclient");
 })
-
+*/
 
 router.post("/register/client", async (req, res) => {
   try {
-    
-    const { name, email, password} = req.body;
 
-    
+    const { name, email, password } = req.body;
+
+
     const existingClient = await Client.findOne({ email });
     if (existingClient) {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
 
 
-   
+
     const newClient = new Client({
       name,
       email,
@@ -70,35 +75,35 @@ router.post("/register/client", async (req, res) => {
       points: 0,
       level: "Bronze",
       completed: 0,
-      otp
+      //otp
     });
 
-   
-      await newClient.save();
 
- 
+    await newClient.save();
 
-   
+
+
+
     await sendverificationcode(email, otp);
-   
-    res.render("verifyotp", { email , userType:"Client"});
- 
 
-    //res.redirect("/verify-otp");
-  /*res.status(201).json({ 
-  message: "Student registered successfully! Verification code sent to email.",
-  redirect: "/verify-otp"
-});
- */
-    //res.status(201).json({ message: "Student registered successfully! Verification code sent to email." });
-    
+    // res.render("verifyotp", { email , userType:"Client"});
+
+
+    /* res.redirect("/verify-otp");
+   res.status(201).json({ 
+   message: "Student registered successfully! Verification code sent to email.",
+   redirect: "/verify-otp"
+ });*/
+
+    res.status(201).json({ message: "Student registered successfully! Verification code sent to email." });
+
   } catch (err) {
     console.error("Registration error:", err);
     res.render("registerClient", { error: "Something went wrong during registration" });;
   }
 });
 
-router.post("/verify-otp/client", async (req, res) => {
+/*router.post("/verify-otp/client", async (req, res) => {
   try {
     const{email,otp}=req.body;
     const result=await verifyemailclient(email,otp); // pass req & res directly
@@ -118,7 +123,7 @@ router.post("/verify-otp/client", async (req, res) => {
   });
 }
 
-});
+});*/
 
 
 
@@ -126,7 +131,7 @@ router.post("/verify-otp/client", async (req, res) => {
 
 
 router.get("/login/client", (req, res) => {
-  res.render("login", { error: null, userType:"Client" });
+  res.render("login", { error: null, userType: "Client" });
 });
 
 
@@ -134,40 +139,47 @@ router.post("/login/client", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-     const client = await Client.findOne({ email });
+    const client = await Client.findOne({ email });
     if (!client) {
-      return res.render("login", { error: "Email not registered", userType:"Client" });
-    }
+  return res.status(400).json({ error: "Email not registered" });
+}
+
 
     const isMatch = await bcrypt.compare(password, client.password);
-    if (!isMatch) {
-      return res.render("login", { error: "Incorrect password",userType:"Client" });
-    }
+   if (!isMatch) {
+  return res.status(400).json({ error: "Incorrect password" });
+}
 
-    
- const token = jwt.sign(
+
+
+    const token = jwt.sign(
       {
         id: client._id,
         role: "Client",
         name: client.name,
-        
+
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, { httpOnly: true });
+    res.json({
+      success: true,
+      token,
+      name: client.name,
+      role: "Client"
+    });
 
-    res.redirect("/profile/client");
 
   } catch (err) {
     console.error(err);
-    res.render("login", { error: "Something went wrong" });
+    res.status(500).json({ error: "Something went wrong" });
+
   }
 });
 
 
-router.get("/profile/client",authenticateToken, (req, res) => {
+router.get("/profile/client", authenticateToken, (req, res) => {
   if (!req.user || req.user.role !== "Client") {
     return res.status(403).send("Access Denied");
   }
@@ -191,7 +203,7 @@ router.get("/logout/client", (req, res) => {
 //------------------------------------lawyer Registration-----------------------------------------------------------
 
 
-router.get("/register/lawyer",async(req,res)=>{
+router.get("/register/lawyer", async (req, res) => {
   res.render("registerlawyer");
 })
 
@@ -199,46 +211,35 @@ router.get("/register/lawyer",async(req,res)=>{
 
 router.post("/register/lawyer", async (req, res) => {
   try {
-    const { name, email, password, registration,phone } = req.body;
+    const { name, email, password, registration } = req.body;
 
-  
     let existingLawyer = await Lawyer.findOne({ email });
     if (existingLawyer) {
-      return res.status(400).send("Lawyer already registered");
+      return res.status(400).json({ error: "Lawyer already registered" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-
-   const lawyer = new Lawyer({
+    const lawyer = new Lawyer({
       name,
       email,
       password: hashedPassword,
       barRegistrationNumber: registration,
-      phone,
-
-
-      otp
     });
 
     await lawyer.save();
 
+    res.status(201).json({
+      message: "Lawyer registered successfully"
+    });
 
-     await sendverificationcode(email, otp);
-   
-      res.render("verifyotp", { email, userType:"Lawyer" });
- 
-    } catch (err) {
-    console.error("Registration error:", err);
-    res.render("registerlawyer", { error: "Something went wrong during registration" });;
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error during registration" });
   }
 });
 
-router.post("/verify-otp/lawyer", async (req, res) => {
+/*router.post("/verify-otp/lawyer", async (req, res) => {
   try {
     const{email,otp}=req.body;
     const result=await verifyemaillawyer(email,otp); 
@@ -252,7 +253,7 @@ router.post("/verify-otp/lawyer", async (req, res) => {
    catch (err) {
     res.render("verifyotp", {email: req.body.email, error:"Internal server error"});
   }
-});
+});*/
 
 
 
@@ -261,7 +262,7 @@ router.post("/verify-otp/lawyer", async (req, res) => {
 //-------------------------------------------lawyer login--------------------------------------------
 
 router.get("/login/lawyer", (req, res) => {
-  res.render("login", { error: null, userType:"Lawyer" });
+  res.render("login", { error: null, userType: "Lawyer" });
 });
 
 router.post("/login/lawyer", async (req, res) => {
@@ -270,12 +271,12 @@ router.post("/login/lawyer", async (req, res) => {
 
     const lawyer = await Lawyer.findOne({ email });
     if (!lawyer) {
-      return res.render("login", { error: "Email not registered", userType:"Lawyer"});
+      return res.render("login", { error: "Email not registered", userType: "Lawyer" });
     }
 
     const isMatch = await bcrypt.compare(password, lawyer.password);
     if (!isMatch) {
-      return res.render("login", { error: "Incorrect password", userType:"Lawyer"});
+      return res.render("login", { error: "Incorrect password", userType: "Lawyer" });
     }
 
     const token = jwt.sign(
@@ -289,15 +290,19 @@ router.post("/login/lawyer", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, { httpOnly: true });
+    res.json({
+  success: true,
+  token,
+  name: lawyer.name,
+  role: "Lawyer"
+});
 
-    res.redirect("/profile/lawyer");
 
   } catch (err) {
     console.error(err);
     res.render("login", { error: "Something went wrong" });
   }
-});   
+});
 
 
 // PROFILE ROUTE (Must be outside)
@@ -306,10 +311,11 @@ router.get("/profile/lawyer", authenticateToken, (req, res) => {
     return res.status(403).send("Access Denied");
   }
 
-  res.render("profile", {
-    name: req.user.name,
-    userType: "Lawyer"
-  });
+ res.json({
+  name: req.user.name,
+  role: "Lawyer"
+});
+
 });
 
 
@@ -327,31 +333,27 @@ router.get("/logout/lawyer", (req, res) => {
 
 //------------------------------------judge Registration-------------------------------------------
 
-router.get("/register/judge", (req, res) => {
+/*router.get("/register/judge", (req, res) => {
   res.render("registerjudge");
 });
-
+*/
 
 router.post("/register/judge", async (req, res) => {
   try {
     const { name, email, password, courtName, barRegistrationNumber } = req.body;
 
-    // Check if teacher already registered
-    const existingJudge = await Judge.findOne({ email });
-    if (existingJudge) {
-      return res.render("registerjudge", { error: "Email already registered" });
+    if (!name || !email || !password || !courtName || !barRegistrationNumber) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-
- 
-  
+    const existingJudge = await Judge.findOne({ email });
+    if (existingJudge) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Save teacher
     const judge = new Judge({
       name,
       email,
@@ -360,46 +362,27 @@ router.post("/register/judge", async (req, res) => {
       barRegistrationNumber,
       otp
     });
-   
 
     await judge.save();
+    await sendverificationcode(email, otp);
 
-   
+    res.status(201).json({
+      message: "Judge registered successfully. OTP sent to email.",
+      email
+    });
 
-
-
-      await sendverificationcode(email, otp);
-   
-      res.render("verifyotp", { email, userType:"Judge" });
- 
-    } catch (err) {
+  } catch (err) {
     console.error("Registration error:", err);
-    res.render("registerjudge", { error: "Something went wrong during registration" });;
-  }
-});
-
-router.post("/verify-otp/judge", async (req, res) => {
-  try {
-    const{email,otp}=req.body;
-    const result=await verifyemailjudge(email,otp); 
-
-    if (result.success) {
-    res.send("Email verified successfully! You can now login.");
-  } else {
-    res.render("verifyotp", {email,userType:"Judge",error: result.message });
-  }
-  }
-   catch (err) {
-    res.render("verifyotp", {email: req.body.email, error:"Internal server error",userType:"Judge"});
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 //----------------------------------------------login teacher------------------------------------
 
-router.get("/login/judge", (req, res) => {
-  res.render("login", { error: null, userType:"Judge" });
+/*router.get("/login/judge", (req, res) => {
+  res.render("login", { error: null, userType: "Judge" });
 });
-
+*/
 
 router.post("/login/judge", async (req, res) => {
   try {
@@ -407,16 +390,15 @@ router.post("/login/judge", async (req, res) => {
 
     const judge = await Judge.findOne({ email });
     if (!judge) {
-      return res.render("login", { error: "Email not registered", userType:"Judge"});
+      return res.status(404).json({ error: "Email not registered" });
     }
 
     const isMatch = await bcrypt.compare(password, judge.password);
     if (!isMatch) {
-      return res.render("login", { error: "Incorrect password", userType:"Judge"});
+      return res.status(401).json({ error: "Incorrect password" });
     }
 
-
-      const token = jwt.sign(
+    const token = jwt.sign(
       {
         id: judge._id,
         role: "Judge",
@@ -427,24 +409,31 @@ router.post("/login/judge", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, { httpOnly: true });
-    
-    res.redirect("/profile/judge");
+    res.json({
+      message: "Login successful",
+      token,
+      name: judge.name,
+      role: "Judge"
+    });
 
   } catch (err) {
     console.error(err);
-    res.render("login", { error: "Something went wrong" });
+    res.status(500).json({ error: "Something went wrong" });
   }
 });
 
 
+
 router.get("/profile/judge", authenticateToken, (req, res) => {
-  if (req.user.role !== "Judge") return res.status(403).send("Access Denied");
-  res.render("profile", { 
-    name: req.user.name, 
-    userType: "Judge" 
+  if (req.user.role !== "Judge")
+    return res.status(403).json({ error: "Access denied" });
+
+  res.json({
+    name: req.user.name,
+    role: "Judge"
   });
 });
+
 
 //---------------------------------logout teacher------------------
 
@@ -456,10 +445,10 @@ router.get("/logout/judge", (req, res) => {
 
 //------------------------------register admin------------------
 
-router.get("/register/admin", (req, res) => {
+/*router.get("/register/admin", (req, res) => {
   res.render("registeradmin");
 });
-
+*/
 
 
 router.post("/register/admin", async (req, res) => {
@@ -467,10 +456,10 @@ router.post("/register/admin", async (req, res) => {
     const { name, email, password, secret } = req.body;
 
 
-const existingAdmin = await Admin.findOne({ email });
-if (existingAdmin) {
-  return res.status(400).send("Admin already registered with this email");
-}
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res.status(400).send("Admin already registered with this email");
+    }
 
 
     console.log("Entered secret:", `"${secret}"`);
@@ -521,7 +510,7 @@ router.post("/login/admin", async (req, res) => {
       return res.render("login", { error: "Incorrect password", userType: "admin" });
     }
 
-       const token = jwt.sign(
+    const token = jwt.sign(
       {
         id: admin._id,
         role: "admin",
@@ -544,9 +533,9 @@ router.post("/login/admin", async (req, res) => {
 
 router.get("/profile/admin", authenticateToken, (req, res) => {
   if (req.user.role !== "admin") return res.status(403).send("Access Denied");
-  res.render("profile", { 
-    name: req.user.name, 
-    userType: "admin" 
+  res.render("profile", {
+    name: req.user.name,
+    userType: "admin"
   });
 });
 
@@ -596,8 +585,8 @@ router.get("/all-clients", async (req, res) => {
 //--------------------------------------------------------------------------------
 router.get("/all-lawyers", async (req, res) => {
   try {
-    const lawyers = await Lawyer.find(); 
-   
+    const lawyers = await Lawyer.find();
+
     res.json(lawyers);
   } catch (err) {
     console.error(err);
@@ -611,8 +600,8 @@ router.get("/all-lawyers", async (req, res) => {
 // ------------------ Get all teachers ------------------
 router.get("/all-judges", async (req, res) => {
   try {
-    
-    const judges = await Judge.find(); 
+
+    const judges = await Judge.find();
     res.json(judges);
   } catch (err) {
     console.error("Error fetching judges:", err);

@@ -94,7 +94,7 @@ const verifyemailclient = async (email, otp) => {
 
 const verifyemaillawyer = async (email, otp) => {
   try {
-    const user = await lawyer.findOne({ email });
+    const user = await Lawyer.findOne({ email });
 
     if (!user) return { success: false, message: "Email not registered" };
 
@@ -118,7 +118,7 @@ const verifyemaillawyer = async (email, otp) => {
 
 const verifyemailjudge = async (email, otp) => {
   try {
-    const user = await judge.findOne({ email });
+    const user = await Judge.findOne({ email });
 
     if (!user) return { success: false, message: "Email not registered" };
 

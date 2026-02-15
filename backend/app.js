@@ -1,7 +1,9 @@
+const cors = require("cors");
 var createError = require('http-errors');
 var dotenv=require("dotenv").config();
 //
 const mongoose = require('mongoose');
+
 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB connected successfully"))
@@ -40,6 +42,13 @@ const {Teacher} =require("./routes/users");*/
 //app.use("/mailer", mailerRoutes.router);
 
 var app = express();
+// CORS MUST be before routes
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -107,21 +116,26 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use((err, req, res, next) => {
+  console.error("GLOBAL ERROR:", err);
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Server error",
+  });
 });
+
+
 
 
 console.log("Gmail:", process.env.EMAIL_USER);
 
 
+const PORT = process.env.PORT ;
 
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
 
 
 
