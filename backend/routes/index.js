@@ -6,29 +6,29 @@ const jwt = require("jsonwebtoken");
 
 
 function authenticateToken(req, res, next) {
-
+ 
   const token = req.cookies.token || req.headers["authorization"]?.split(" ")[1];
 
   if (!token) return res.status(401).json({ message: "Access Denied" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: "Invalid Token" });
-    req.user = user;
+    req.user = user; 
     next();
   });
 }
 
 
 
-const { Student, Parent, Teacher, Institution, Admin } = require("./users");
-const { sendverificationcode, verifyemailstudent, verifyemailparent, verifyemailteacher } = require("./mailer");
+const { Client, Lawyer, Judge, Admin, Case, Judgement,} = require("./users");
+const { sendverificationcode, verifyemailclient, verifyemaillawyer,verifyemailjudge } = require("./mailer");
 
 
 
-/*router.get('/', function (req, res) {
-  res.render('index', { title: "Debasish" });
+router.get('/', function(req, res) {
+  res.render('index',{title:"Debasish"}) ;
 });
-*/
+
 
 function isAdmin(req, res, next) {
   if (!req.user || req.user.role !== "admin") {
@@ -38,207 +38,219 @@ function isAdmin(req, res, next) {
 }
 
 
-//----------------------------------------register student--------------------------------------------------------
+//----------------------------------------register client--------------------------------------------------------
+
+router.get("/register/client",async(req,res)=>{
+  res.render("registerclient");
+})
 
 
-
-
-router.post("/register/student", async (req, res) => {
+router.post("/register/client", async (req, res) => {
   try {
+    
+    const { name, email, password} = req.body;
 
-    const { name, username, email, password, institutionName } = req.body;
-
-
-    const existingStudent = await Student.findOne({ email });
-    if (existingStudent) {
+    
+    const existingClient = await Client.findOne({ email });
+    if (existingClient) {
       return res.status(400).json({ error: "Email already registered" });
     }
 
-
+    
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
 
-    let institution = await Institution.findOne({ name: institutionName });
-    if (!institution) {
-      const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      console.log(randomCode);
-      institution = new Institution({
-        name: institutionName,
-        code: randomCode
-      });
-      await institution.save();
-    }
 
-    const newStudent = new Student({
+   
+    const newClient = new Client({
       name,
-      username,
       email,
       password: hashedPassword,
-      institution: institution._id,
       points: 0,
-      Level: "Bronze",
+      level: "Bronze",
       completed: 0,
       otp
     });
 
+   
+      await newClient.save();
 
-    await newStudent.save();
+ 
 
-    institution.students.push(newStudent._id);
-    await institution.save();
-
-
+   
     await sendverificationcode(email, otp);
-
-    res.status(201).json({
-      message: "Student registered successfully! Check your email for OTP.",
-      email,
-      userType: "student"
-    });
-
-
+   
+    res.render("verifyotp", { email , userType:"Client"});
+ 
 
     //res.redirect("/verify-otp");
-    /*res.status(201).json({ 
-    message: "Student registered successfully! Verification code sent to email.",
-    redirect: "/verify-otp"
-  });
-   */
+  /*res.status(201).json({ 
+  message: "Student registered successfully! Verification code sent to email.",
+  redirect: "/verify-otp"
+});
+ */
     //res.status(201).json({ message: "Student registered successfully! Verification code sent to email." });
-
+    
   } catch (err) {
     console.error("Registration error:", err);
-    res.render("registerstudent", { error: "Something went wrong during registration" });;
+    res.render("registerClient", { error: "Something went wrong during registration" });;
   }
 });
 
-router.post("/verify-otp/student", async (req, res) => {
+router.post("/verify-otp/client", async (req, res) => {
   try {
-    const { email, otp } = req.body;
-    const result = await verifyemailstudent(email, otp); // pass req & res directly
+    const{email,otp}=req.body;
+    const result=await verifyemailclient(email,otp); // pass req & res directly
 
-    
     if (result.success) {
-      res.send("Email verified successfully! You can now login.");
-    } else {
-      res.render("verifyotp", { email, userType: "student", error: result.message });
-    }
+    res.send("Email verified successfully! You can now login.");
+  } else {
+    res.render("verifyotp", {email,userType:"Client",error: result.message });
+  }
   }
   catch (err) {
-    res.render("verifyotp", { email: req.body.email, error: "Internal server error" });
-  }
+  console.error(err);
+  res.render("verifyotp", {
+    email: req.body.email,
+    userType: "Client",
+    error: "Internal server error"
+  });
+}
+
 });
 
 
 
-//-----------------------------------log in student----------------------------
+//-----------------------------------log in client----------------------------
 
 
+router.get("/login/client", (req, res) => {
+  res.render("login", { error: null, userType:"Client" });
+});
 
 
-// POST /login/student
-router.post("/login/student", async (req, res) => {
+router.post("/login/client", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const student = await Student.findOne({ email }).populate("institution");
-    if (!student) {
-      return res.status(400).json({ error: "Email not registered" });
+     const client = await Client.findOne({ email });
+    if (!client) {
+      return res.render("login", { error: "Email not registered", userType:"Client" });
     }
 
-    const isMatch = await bcrypt.compare(password, student.password);
+    const isMatch = await bcrypt.compare(password, client.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Incorrect password" });
+      return res.render("login", { error: "Incorrect password",userType:"Client" });
     }
 
-    const token = jwt.sign(
+    
+ const token = jwt.sign(
       {
-        id: student._id,
-        role: "student",
-        name: student.name,
-        institute: student.institute ? student.institute.name : null
+        id: client._id,
+        role: "Client",
+        name: client.name,
+        
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // send token as JSON
-    res.json({ message: "Login successful", token, name: student.name,  role: "student" });
+    res.cookie("token", token, { httpOnly: true });
+
+    res.redirect("/profile/client");
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
+    res.render("login", { error: "Something went wrong" });
   }
 });
 
 
-
-router.get("/profile/student", authenticateToken, (req, res) => {
-  if (!req.user || req.user.role !== "student") {
+router.get("/profile/client",authenticateToken, (req, res) => {
+  if (!req.user || req.user.role !== "Client") {
     return res.status(403).send("Access Denied");
   }
 
   res.render("profile", {
     name: req.user.name,
-    institute: req.user.institute,
-    userType: "student"
+    userType: "Client"
   });
 });
 // ---------- LOGOUT ---------------------------------------------------
 
 
-router.get("/logout/student", (req, res) => {
+router.get("/logout/client", (req, res) => {
   res.clearCookie("token");
-  res.redirect("/login/student");
+  res.redirect("/login/client");
 });
 
 
 
 
-//------------------------------------Parent Registration-----------------------------------------------------------
+//------------------------------------lawyer Registration-----------------------------------------------------------
+
+
+router.get("/register/lawyer",async(req,res)=>{
+  res.render("registerlawyer");
+})
 
 
 
-
-
-router.post("/register/parent", async (req, res) => {
+router.post("/register/lawyer", async (req, res) => {
   try {
-    const { name, email, password, studentEmail } = req.body;
+    const { name, email, password, registration,phone } = req.body;
 
-    // Check if parent already exists
-    let existingParent = await Parent.findOne({ email });
-    if (existingParent) {
-      return res.status(400).json({ error: "Parent already registered" });
+  
+    let existingLawyer = await Lawyer.findOne({ email });
+    if (existingLawyer) {
+      return res.status(400).send("Lawyer already registered");
     }
 
-    // Check if student exists
-    const student = await Student.findOne({ email: studentEmail });
-    if (!student) {
-      return res.status(404).json({ error: "Student not found" });
-    }
 
-    // Hash password and generate OTP
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  
 
-    const parent = new Parent({
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+
+   const lawyer = new Lawyer({
       name,
       email,
       password: hashedPassword,
-      children: [student._id],
+      barRegistrationNumber: registration,
+      phone,
+
+
       otp
     });
 
-    await parent.save();
+    await lawyer.save();
 
-    await sendverificationcode(email, otp);
 
-    // Return JSON instead of rendering
-    res.status(200).json({ message: "Parent registered successfully. Please verify OTP.", email });
-
-  } catch (err) {
+     await sendverificationcode(email, otp);
+   
+      res.render("verifyotp", { email, userType:"Lawyer" });
+ 
+    } catch (err) {
     console.error("Registration error:", err);
-    res.status(500).json({ error: "Something went wrong during registration" });
+    res.render("registerlawyer", { error: "Something went wrong during registration" });;
+  }
+});
+
+router.post("/verify-otp/lawyer", async (req, res) => {
+  try {
+    const{email,otp}=req.body;
+    const result=await verifyemaillawyer(email,otp); 
+
+    if (result.success) {
+    res.send("Email verified successfully! You can now login.");
+  } else {
+    res.render("verifyotp", {email,userType:"Lawyer",error: result.message });
+  }
+  }
+   catch (err) {
+    res.render("verifyotp", {email: req.body.email, error:"Internal server error"});
   }
 });
 
@@ -246,70 +258,65 @@ router.post("/register/parent", async (req, res) => {
 
 
 
-//-------------------------------------------parent login--------------------------------------------
+//-------------------------------------------lawyer login--------------------------------------------
 
+router.get("/login/lawyer", (req, res) => {
+  res.render("login", { error: null, userType:"Lawyer" });
+});
 
-
-// ---------------- Parent Login ----------------
-router.post("/login/parent", async (req, res) => {
+router.post("/login/lawyer", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const parent = await Parent.findOne({ email }).populate("children");
-    if (!parent) {
-      return res.status(400).json({ error: "Email not registered" });
+    const lawyer = await Lawyer.findOne({ email });
+    if (!lawyer) {
+      return res.render("login", { error: "Email not registered", userType:"Lawyer"});
     }
 
-    const isMatch = await bcrypt.compare(password, parent.password);
+    const isMatch = await bcrypt.compare(password, lawyer.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Incorrect password" });
+      return res.render("login", { error: "Incorrect password", userType:"Lawyer"});
     }
 
     const token = jwt.sign(
       {
-        id: parent._id,
-        role: "parent",
-        name: parent.name,
-        email: parent.email,
-        student: parent.children.length ? parent.children[0].name : null,
+        id: lawyer._id,
+        role: "Lawyer",
+        name: lawyer.name,
+        email: lawyer.email,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Send JSON instead of redirect
-    res.json({
-      message: "Login successful",
-      token,
-      name: parent.name,
-      role: "parent",
-      student: parent.children.length ? parent.children[0].name : null
-    });
+    res.cookie("token", token, { httpOnly: true });
+
+    res.redirect("/profile/lawyer");
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
+    res.render("login", { error: "Something went wrong" });
   }
-});
+});   
 
-// ---------------- Parent Profile ----------------
-router.get("/profile/parent", authenticateToken, (req, res) => {
-  if (req.user.role !== "parent") {
-    return res.status(403).json({ error: "Access Denied" });
+
+// PROFILE ROUTE (Must be outside)
+router.get("/profile/lawyer", authenticateToken, (req, res) => {
+  if (!req.user || req.user.role !== "Lawyer") {
+    return res.status(403).send("Access Denied");
   }
 
-  res.json({
+  res.render("profile", {
     name: req.user.name,
-    student: req.user.student,
-    role: "parent"
+    userType: "Lawyer"
   });
 });
 
 
-//-------------------------------------logout---------------------------------------
-router.get("/logout/parent", (req, res) => {
+// LOGOUT
+router.get("/logout/lawyer", (req, res) => {
   res.clearCookie("token");
-  res.redirect("/login/parent");
+  res.redirect("/login/lawyer");
 });
 
 
@@ -317,29 +324,27 @@ router.get("/logout/parent", (req, res) => {
 
 
 
-//------------------------------------Teacher Registration-------------------------------------------
+
+//------------------------------------judge Registration-------------------------------------------
+
+router.get("/register/judge", (req, res) => {
+  res.render("registerjudge");
+});
 
 
-
-router.post("/register/teacher", async (req, res) => {
+router.post("/register/judge", async (req, res) => {
   try {
-    const { name, email, password, institutionName, institutionCode } = req.body;
+    const { name, email, password, courtName, barRegistrationNumber } = req.body;
 
     // Check if teacher already registered
-    const existingTeacher = await Teacher.findOne({ email });
-    if (existingTeacher) {
-      return res.status(400).json({ error: "Email already registered" });
+    const existingJudge = await Judge.findOne({ email });
+    if (existingJudge) {
+      return res.render("registerjudge", { error: "Email already registered" });
     }
 
-    const institution = await Institution.findOne({ name: institutionName });
-    if (!institution) {
-      return res.status(404).json({ error: "Institution not found. Ask admin to register it first." });
 
-    }
-
-    if (institution.code !== institutionCode) {
-      return res.status(400).json({ error: "Institution code does not match" });
-    }
+ 
+  
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -347,117 +352,132 @@ router.post("/register/teacher", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Save teacher
-    const teacher = new Teacher({
+    const judge = new Judge({
       name,
       email,
       password: hashedPassword,
-      institution: institution._id,
+      courtName,
+      barRegistrationNumber,
       otp
     });
+   
 
-    await teacher.save();
+    await judge.save();
 
-    institution.teachers = institution.teachers || [];
-    institution.teachers.push(teacher._id);
-    await institution.save();
+   
 
-    await sendverificationcode(email, otp);
 
-    // ✅ Send JSON response
-    res.status(201).json({
-      message: "Teacher registered successfully! Check your email for OTP.",
-      email,
-      userType: "teacher"
-    });
 
-  } catch (err) {
-    console.error("Teacher registration error:", err);
-    res.status(500).json({ error: "Something went wrong during registration" });
+      await sendverificationcode(email, otp);
+   
+      res.render("verifyotp", { email, userType:"Judge" });
+ 
+    } catch (err) {
+    console.error("Registration error:", err);
+    res.render("registerjudge", { error: "Something went wrong during registration" });;
   }
 });
 
+router.post("/verify-otp/judge", async (req, res) => {
+  try {
+    const{email,otp}=req.body;
+    const result=await verifyemailjudge(email,otp); 
+
+    if (result.success) {
+    res.send("Email verified successfully! You can now login.");
+  } else {
+    res.render("verifyotp", {email,userType:"Judge",error: result.message });
+  }
+  }
+   catch (err) {
+    res.render("verifyotp", {email: req.body.email, error:"Internal server error",userType:"Judge"});
+  }
+});
 
 //----------------------------------------------login teacher------------------------------------
 
-/*router.get("/login/teacher", (req, res) => {
-  res.render("login", { error: null, userType: "teacher" });
-});*/
+router.get("/login/judge", (req, res) => {
+  res.render("login", { error: null, userType:"Judge" });
+});
 
 
-router.post("/login/teacher", async (req, res) => {
+router.post("/login/judge", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const teacher = await Teacher.findOne({ email }).populate("institution");
-    if (!teacher) {
-      return res.status(400).json({ error: "Email not registered" });
+    const judge = await Judge.findOne({ email });
+    if (!judge) {
+      return res.render("login", { error: "Email not registered", userType:"Judge"});
     }
 
-    const isMatch = await bcrypt.compare(password, teacher.password);
+    const isMatch = await bcrypt.compare(password, judge.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Incorrect password" });
+      return res.render("login", { error: "Incorrect password", userType:"Judge"});
     }
 
-    const token = jwt.sign(
+
+      const token = jwt.sign(
       {
-        id: teacher._id,
-        role: "teacher",
-        name: teacher.name,
-        email: teacher.email,
-        institution: teacher.institution ? teacher.institution.name : null,
+        id: judge._id,
+        role: "Judge",
+        name: judge.name,
+        email: judge.email,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Send JSON instead of redirect
-    res.json({
-      message: "Login successful",
-      token,
-      name: teacher.name,
-      role: "teacher",
-      institution: teacher.institution ? teacher.institution.name : null
-    });
+    res.cookie("token", token, { httpOnly: true });
+    
+    res.redirect("/profile/judge");
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
+    res.render("login", { error: "Something went wrong" });
   }
 });
 
 
-
-router.get("/profile/teacher", authenticateToken, (req, res) => {
-  if (req.user.role !== "teacher") return res.status(403).json({ error: "Access Denied" });
-
-  res.json({
-    name: req.user.name,
-    institution: req.user.institution,
-    role: "teacher"
+router.get("/profile/judge", authenticateToken, (req, res) => {
+  if (req.user.role !== "Judge") return res.status(403).send("Access Denied");
+  res.render("profile", { 
+    name: req.user.name, 
+    userType: "Judge" 
   });
 });
 
-
 //---------------------------------logout teacher------------------
 
-router.get("/logout/teacher", (req, res) => {
+router.get("/logout/judge", (req, res) => {
   res.clearCookie("token");
-  res.redirect("/login/teacher");
+  res.redirect("/login/judge");
 });
 
 
-// ------------------------------ Register Admin ------------------
+//------------------------------register admin------------------
+
+router.get("/register/admin", (req, res) => {
+  res.render("registeradmin");
+});
+
+
+
 router.post("/register/admin", async (req, res) => {
   try {
     const { name, email, password, secret } = req.body;
 
-    if (!secret || secret.trim() !== process.env.ADMIN_SECRET.trim()) {
-      return res.status(403).json({ error: "Unauthorized: Invalid secret key" });
-    }
 
-    const existingAdmin = await Admin.findOne({ email });
-    if (existingAdmin) {
-      return res.status(400).json({ error: "Email already registered" });
+const existingAdmin = await Admin.findOne({ email });
+if (existingAdmin) {
+  return res.status(400).send("Admin already registered with this email");
+}
+
+
+    console.log("Entered secret:", `"${secret}"`);
+    console.log("Env secret:", `"${process.env.ADMIN_SECRET}"`);
+
+    if (secret.trim() !== process.env.ADMIN_SECRET.trim()) {
+      return res.status(403).send("Unauthorized: Invalid secret key");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -469,31 +489,39 @@ router.post("/register/admin", async (req, res) => {
     });
 
     await newAdmin.save();
-
-    res.status(201).json({ message: "Admin registered successfully!" });
+    res.send("Admin registered successfully");
   } catch (err) {
     console.error("Error registering admin:", err);
-    res.status(500).json({ error: "Error registering admin" });
+    res.status(500).send("Error registering admin");
   }
 });
 
 
-// ------------------------------ Login Admin ------------------
+
+
+//-------------------------------------------login admin-------------------------------
+
+
+
+router.get("/login/admin", (req, res) => {
+  res.render("login", { error: null, userType: "admin" });
+});
+
 router.post("/login/admin", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      return res.status(400).json({ error: "Email not registered" });
+      return res.render("login", { error: "Email not registered", userType: "admin" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Incorrect password" });
+      return res.render("login", { error: "Incorrect password", userType: "admin" });
     }
 
-    const token = jwt.sign(
+       const token = jwt.sign(
       {
         id: admin._id,
         role: "admin",
@@ -504,72 +532,76 @@ router.post("/login/admin", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      name: admin.name,
-      email: admin.email,
-       role: "admin"
-    });
+    res.cookie("token", token, { httpOnly: true });
+
+    res.redirect("/profile/admin");
   } catch (err) {
-    console.error("Admin login error:", err);
-    res.status(500).json({ error: "Something went wrong during login" });
+    console.error(err);
+    res.render("login", { error: "Something went wrong", userType: "admin" });
   }
 });
 
 
-// ------------------------------ Admin Profile ------------------
 router.get("/profile/admin", authenticateToken, (req, res) => {
-  if (!req.user || req.user.role !== "admin") {
-    return res.status(403).json({ error: "Access Denied" });
-  }
-
-  res.status(200).json({
-    name: req.user.name,
-    email: req.user.email,
-    role: req.user.role,
+  if (req.user.role !== "admin") return res.status(403).send("Access Denied");
+  res.render("profile", { 
+    name: req.user.name, 
+    userType: "admin" 
   });
 });
 
 
-// ------------------------------ Get All Admins ------------------
+//---------------------------------logout admin------------------
+
+router.get("/logout/admin", (req, res) => {
+  res.clearCookie("token");
+  res.redirect("/login/admin");
+});
+
+
+
+//------------------------------------all admins------------------------------------------------
+
+
+
+
 router.get("/all-admins", authenticateToken, isAdmin, async (req, res) => {
   try {
-    const admins = await Admin.find().select("-password"); // hide password
-    res.status(200).json(admins);
+    const admins = await Admin.find().select("-password");
+    res.json(admins);
   } catch (err) {
     console.error("Error fetching admins:", err);
-    res.status(500).json({ error: "Error fetching admins" });
+    res.status(500).send("Error fetching admins");
   }
 });
 
 
 
 
-// -----------------------------------------------allstudents -----------------------------------
-router.get("/all-students", async (req, res) => {
+// -----------------------------------------------allclients -----------------------------------
+router.get("/all-clients", async (req, res) => {
   try {
-    const students = await Student.find().populate("institution"); // populate institution if needed
-    res.json(students);
+    const clients = await Client.find(); // populate institution if needed
+    res.json(clients);
   } catch (err) {
-    console.error("Error fetching students:", err);
-    res.status(500).send("Error fetching students");
+    console.error("Error fetching clients:", err);
+    res.status(500).send("Error fetching clients");
   }
 });
 
 
 
 
-//-------------------------------------------------allparents---------------------
+//-------------------------------------------------alllawyer---------------------
 //--------------------------------------------------------------------------------
-router.get("/all-parents", async (req, res) => {
+router.get("/all-lawyers", async (req, res) => {
   try {
-    const parents = await Parent.find().populate("children");
-
-    res.json(parents);
+    const lawyers = await Lawyer.find(); 
+   
+    res.json(lawyers);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error fetching parents");
+    res.status(500).send("Error fetching lawyers");
   }
 });
 
@@ -577,45 +609,31 @@ router.get("/all-parents", async (req, res) => {
 
 
 // ------------------ Get all teachers ------------------
-router.get("/all-teachers", async (req, res) => {
+router.get("/all-judges", async (req, res) => {
   try {
-    // Fetch all teachers and populate their institution
-    const teachers = await Teacher.find().populate("institution");
-    res.json(teachers);
+    
+    const judges = await Judge.find(); 
+    res.json(judges);
   } catch (err) {
-    console.error("Error fetching teachers:", err);
-    res.status(500).send("Error fetching teachers");
+    console.error("Error fetching judges:", err);
+    res.status(500).send("Error fetching judges");
   }
 });
 
 
-//-------------------------------allinstitutions----------------------------------
-// ---------------- ALL INSTITUTIONS -----------------
-router.get("/all-institutions", async (req, res) => {
-  try {
-    const allinstitutions = await Institution.find().populate("students");
 
-
-
-    res.json(allinstitutions);
-  } catch (err) {
-    console.error("Error fetching institutions:", err);
-    res.status(500).send("Error fetching institutions");
-  }
-});
 
 
 
 //---------------------------------------------empty-database----------------------------
 router.get("/delete-all", async (req, res) => {
   try {
-    await Student.deleteMany({});
-    await Parent.deleteMany({});
-    await Teacher.deleteMany({});
-    await Institution.deleteMany({});
+    await Client.deleteMany({});
+    await Lawyer.deleteMany({});
+    await Judge.deleteMany({});
     await Admin.deleteMany({});
 
-    res.send("All users (students, parents, teachers, institutions, admins) deleted successfully.");
+    res.send("All users (clients, lawyers, judges, admins) deleted successfully.");
   } catch (err) {
     console.error("Error deleting all users:", err);
     res.status(500).send("Error deleting all users");
