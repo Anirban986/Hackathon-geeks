@@ -1,137 +1,146 @@
-const express =require("express");
 const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
+require("dotenv").config();
 
-dotenv.config();
+const { Client, Lawyer, Judge } = require("./users");
 
-const router = express.Router();
-
-const { Student, Parent, Teacher, Institution, Admin } = require("./users");
-
-
+// ---------------------- TRANSPORTER ----------------------
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS  
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
-const { Verification_Email_Template } = require("../emails/varification");
-const { Welcome_Email_Template } = require("../emails/welcome");
+// Verify transporter on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.log("❌ Email transporter error:", error);
+  } else {
+    console.log("✅ Email server ready to send messages");
+  }
+});
 
+// ---------------------- SEND OTP ----------------------
 
-   const sendverificationcode=async(email,verificationcode)=>{
-    try{
-    const response = await transporter.sendMail({
-    from: `"Disastra verification service" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "Disastraverification",
-    text: "Disastra verification", 
-    html:  Verification_Email_Template(verificationcode)
-  });
+const sendverificationcode = async (email, otp) => {
+  try {
+    console.log("📨 Sending OTP to:", email);
 
-  console.log("Message sent sucessfully");
-} 
-catch(err){
-  console.log(err);
-}}
+    await transporter.sendMail({
+      from: `"Judgemental Verification" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your OTP Verification Code",
+      html: `
+        <h2>OTP Verification</h2>
+        <p>Your verification code is:</p>
+        <h1>${otp}</h1>
+        <p>This code will expire soon.</p>
+      `
+    });
+
+    console.log("✅ OTP sent successfully");
+  } catch (error) {
+    console.error("❌ Error sending OTP:", error);
+  }
+};
+
+// ---------------------- WELCOME EMAIL ----------------------
 
 const sendWelcomeEmail = async (email, name) => {
-  await transporter.sendMail({
-    from: `"Disastra Team" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "Welcome to Disastra",
-    html: Welcome_Email_Template(name)
-  });
-};
-
-const verifyemailstudent=async(email , otp)=>{
-  try{
-  //const{email, code}=req.body;
-  const student=await Student.findOne({
-    email
-  })
-
-
-if(student.otp!==otp){
-return { success: false, message: "Email not found" };}
-
- student.isverified=true;
- student.otp=undefined
- await student.save();
-
- await sendWelcomeEmail(student.email, student.name || "User");
-// return res.status(200).json({ error: "Email registered successfully" });
-return { success: true, message: "Email verified successfully" };
-  } catch (error) {
-    console.error(error);
-    return { success: false, message: "Internal server error" };
-  }
-}
-
-
-
-
-const verifyemailparent=async(email , otp)=>{
-  try{
-  //const{email, code}=req.body;
-  const parent=await Parent.findOne({
-    email
-  })
-
-
-if(parent.otp!==otp){
-return { success: false, message: "Email not found" };}
-
- parent.isverified=true;
- parent.otp=undefined
- await parent.save();
-
- await sendWelcomeEmail(parent.email, parent.name || "User");
-// return res.status(200).json({ error: "Email registered successfully" });
-return { success: true, message: "Email verified successfully" };
-  } catch (error) {
-    console.error(error);
-    return { success: false, message: "Internal server error" };
-  }
-}
-
-
-const verifyemailteacher = async (email, otp) => {
   try {
-    const teacher = await Teacher.findOne({ email });
+    await transporter.sendMail({
+      from: `"Judgemental Team" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Welcome to Judgemental",
+      html: `
+        <h2>Welcome, ${name} 👋</h2>
+        <p>Your account has been successfully verified.</p>
+      `
+    });
 
-    if (!teacher) {
-      return { success: false, message: "Email not registered" };
-    }
+    console.log("✅ Welcome email sent");
+  } catch (error) {
+    console.error("❌ Error sending welcome email:", error);
+  }
+};
 
-    
-    if (teacher.otp.toString().trim() !== otp.toString().trim()) {
-      console.log("OTP mismatch:", { dbOtp: teacher.otp, enteredOtp: otp });
+// ---------------------- VERIFY CLIENT ----------------------
+
+const verifyemailclient = async (email, otp) => {
+  try {
+    const user = await Client.findOne({ email });
+
+    if (!user) return { success: false, message: "Email not registered" };
+
+    if (user.otp !== otp)
       return { success: false, message: "OTP does not match" };
-    }
 
-    teacher.isverified = true;
-    teacher.otp = undefined;
-    await teacher.save();
+    user.isverified = true;
+    user.otp = undefined;
+    await user.save();
 
-    await sendWelcomeEmail(teacher.email, teacher.name || "User");
+    await sendWelcomeEmail(user.email, user.name);
 
-    return { success: true, message: "Email verified successfully" };
+    return { success: true };
   } catch (error) {
     console.error(error);
     return { success: false, message: "Internal server error" };
   }
 };
 
+// ---------------------- VERIFY LAWYER ----------------------
 
+const verifyemaillawyer = async (email, otp) => {
+  try {
+    const user = await lawyer.findOne({ email });
 
+    if (!user) return { success: false, message: "Email not registered" };
 
+    if (user.otp !== otp)
+      return { success: false, message: "OTP does not match" };
 
+    user.isverified = true;
+    user.otp = undefined;
+    await user.save();
 
-module.exports={ sendverificationcode, verifyemailstudent,verifyemailparent,verifyemailteacher };
+    await sendWelcomeEmail(user.email, user.name);
 
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Internal server error" };
+  }
+};
 
+// ---------------------- VERIFY JUDGE ----------------------
 
+const verifyemailjudge = async (email, otp) => {
+  try {
+    const user = await judge.findOne({ email });
+
+    if (!user) return { success: false, message: "Email not registered" };
+
+    if (user.otp !== otp)
+      return { success: false, message: "OTP does not match" };
+
+    user.isverified = true;
+    user.otp = undefined;
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.name);
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Internal server error" };
+  }
+};
+
+module.exports = {
+  sendverificationcode,
+  verifyemailclient,
+  verifyemaillawyer,
+  verifyemailjudge
+};
