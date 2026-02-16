@@ -1,0 +1,116 @@
+/* Full page center */
+.container {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #0a192f, #020617);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+}
+
+/* File input */
+.file-input {
+    padding: 14px;
+    width: 320px;
+    border-radius: 12px;
+    border: 2px dashed rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.file-input:hover {
+    border-color: #3b82f6;
+    background: rgba(59,130,246,0.08);
+}
+
+/* Upload button */
+.upload-btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.6);
+}
+
+.upload-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Summary box */
+.summary-box {
+    width: 90%;
+    max-width: 750px;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 28px;
+    margin-top: 25px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+    animation: fadeIn 0.5s ease;
+}
+
+/* Headings */
+.summary-box h2 {
+    margin-bottom: 18px;
+    color: #60a5fa;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Text */
+.summary-box p {
+    margin-bottom: 12px;
+    line-height: 1.7;
+    color: #e5e7eb;
+}
+
+/* Key points list */
+.summary-box ul {
+    margin-top: 12px;
+    padding-left: 18px;
+}
+
+.summary-box li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #d1d5db;
+    position: relative;
+}
+
+/* bullet styling */
+.summary-box li::marker {
+    color: #3b82f6;
+    font-size: 1.2em;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
