@@ -1,77 +1,69 @@
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// 🔥 UPDATED: Using the model your scan confirmed exists
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-2.5-flash", 
+  generationConfig: {
+    responseMimeType: "application/json" // 2.5 supports strict JSON!
+  }
 });
 
 exports.generateSummary = async (text) => {
+  let raw = ""; 
 
   const prompt = `
-You are a legal AI assistant.
+  You are a legal AI assistant.
+  Summarize the following case document.
+  
+  RETURN ONLY RAW JSON.
+  
+  {
+    "case_title": "string",
+    "parties_involved": "string",
+    "key_facts": ["string"],
+    "legal_issues": "string",
+    "applicable_sections": "string",
+    "petitioner_arguments": "string",
+    "respondent_arguments": "string",
+    "judgment_summary": "string",
+    "important_dates": ["string"]
+  }
 
-Return ONLY JSON. No explanation. No markdown.
-
-{
-  "case_title": "",
-  "parties_involved": "",
-  "key_facts": [],
-  "legal_issues": "",
-  "applicable_sections": "",
-  "petitioner_arguments": "",
-  "respondent_arguments": "",
-  "judgment_summary": "",
-  "important_dates": []
-}
-
-Case Document:
-${text}
-`;
+  Case Document:
+  ${text}
+  `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-    });
-
-    // 🔥 Universal text extractor (works for every Gemini response type)
-    let raw =
-      response?.text?.() ||
-      response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "";
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    
+    // Extract text
+    raw = response.text();
 
     if (!raw) throw new Error("Empty AI response");
 
-    // clean markdown
-    raw = raw.replace(/```json/g, "")
-             .replace(/```/g, "")
-             .trim();
+    // Clean Markdown if present (e.g. ```json ... ```)
+    const cleanedText = raw.replace(/```json/g, "").replace(/```/g, "").trim();
 
-    // isolate JSON
-    const start = raw.indexOf("{");
-    const end = raw.lastIndexOf("}");
+    // Parse JSON
+    return JSON.parse(cleanedText);
 
-    if (start !== -1 && end !== -1) {
-      raw = raw.substring(start, end + 1);
+  } catch (error) {
+    console.error("🔥 GEMINI SERVICE ERROR:", error.message);
+    
+    // Log the raw response only if it exists (prevents "raw is not defined" crash)
+    if (raw) {
+        console.log("RAW RESPONSE THAT FAILED:", raw);
     }
 
-    return JSON.parse(raw);
-
-  } catch (err) {
-    console.error("Gemini Error:", err.message);
-    console.log("RAW RESPONSE:", raw);
     return {
-      case_title: "AI parsing failed",
-      parties_involved: "",
+      case_title: "Error processing document",
+      parties_involved: "Unknown",
+      judgment_summary: `System Error: ${error.message}.`,
       key_facts: [],
-      legal_issues: "",
-      applicable_sections: "",
-      petitioner_arguments: "",
-      respondent_arguments: "",
-      judgment_summary: "The AI response could not be structured. Try another PDF.",
       important_dates: []
     };
   }
 };
-
-
-
