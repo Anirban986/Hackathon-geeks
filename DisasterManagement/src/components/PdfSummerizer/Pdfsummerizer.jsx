@@ -20,14 +20,10 @@ const handleUpload=async()=>{
 
     try{
         setLoading(true);
-        const response =await axios.post(
-            "http://localhost:5000/api/summarize",
-            formdata,{
-                headers:{
-                    "Content-Type":"multipart/form-data",
-                },
-            }
-        );
+       const response = await axios.post(
+  "http://localhost:5000/api/summarize",
+  formdata
+);
 
         setSummery(response.data);
     }catch(error){

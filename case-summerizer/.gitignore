@@ -1,0 +1,15 @@
+# secrets
+.env
+
+# uploads
+uploads/
+
+# dependencies
+node_modules/
+
+# build
+dist/
+build/
+
+# logs
+*.log

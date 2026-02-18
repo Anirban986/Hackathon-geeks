@@ -58,7 +58,7 @@ ${text}
 
   } catch (err) {
     console.error("Gemini Error:", err.message);
-
+    console.log("RAW RESPONSE:", raw);
     return {
       case_title: "AI parsing failed",
       parties_involved: "",
@@ -72,3 +72,6 @@ ${text}
     };
   }
 };
+
+
+

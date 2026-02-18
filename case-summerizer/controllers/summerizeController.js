@@ -6,7 +6,11 @@ const { chunkText } = require("../services/chunkService");
 exports.summarizeCase = async (req, res) => {
   try {
     console.log("Request received");
-
+    if (!req.file) {
+      return res.status(400).json({
+        error: "No PDF uploaded"
+      });
+    }
     const filePath = req.file.path;
 
     const text = await extractTextFromPDF(filePath);
@@ -20,14 +24,19 @@ exports.summarizeCase = async (req, res) => {
     const summary = await generateSummary(limitedText);
 
     console.log("Gemini response received");
-
-    res.json(summary);
+     if (!summary || typeof summary !== "object") {
+      return res.status(500).json({
+        error: "AI returned invalid format"
+      });
+    }
+   return res.json(summary);
 
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error summarizing case"
+    console.error("🔥 CONTROLLER CRASH:", error);
+
+    return res.status(500).json({
+      error: error.message
     });
   }
-};
+  };
+
