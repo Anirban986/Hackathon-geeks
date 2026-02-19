@@ -101,7 +101,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([
     {
       role: "bot",
-      text: "Hello! I'm DisastraBot, your disaster assistance companion. I'm here to help you with emergency information, safety tips, and disaster preparedness. How can I assist you today?",
+      text: "Hello! I'm LegalBot, your legal assistance companion. I'm here to help you with legal information, safety tips, and legal preparedness. How can I assist you today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -132,7 +132,7 @@ const Chatbot = () => {
     setMessages([
       {
         role: "bot",
-        text: "Hello! I'm DisastraBot, your disaster assistance companion. I'm here to help you with emergency information, safety tips, and disaster preparedness. How can I assist you today?",
+        text: "Hello! I'm LegalBot, your legal assistance companion. I'm here to help you with legal information, safety tips, and legal preparedness. How can I assist you today?",
       },
     ]);
     setInput("");
@@ -249,7 +249,7 @@ const Chatbot = () => {
   return (
     <div className="chat-wrapper">
       <div className="chat-header">
-        <span>DisastraBot 🤖 - Your Friend In Disaster Situation 🤝</span>
+        <span>LegalBot 🤖 - Your Friend In Legal Situation 🤝</span>
         <div className="chat-header-tools">
           <button
             className="header-btn"
@@ -293,7 +293,7 @@ const Chatbot = () => {
         ))}
         {isThinking && (
           <div className="message bot thinking">
-            <p>💬 DisastraBot is thinking...</p>
+            <p>💬 LegalBot is thinking...</p>
           </div>
         )}
       </div>
